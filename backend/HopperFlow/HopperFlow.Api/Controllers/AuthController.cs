@@ -1,5 +1,8 @@
 ﻿using HopperFlow.Application.Common.Interfaces;
 using HopperFlow.Application.DTOs;
+using HopperFlow.Domain.Entities;
+using HopperFlow.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HopperFlow.API.Controllers;
@@ -44,5 +47,29 @@ public class AuthController : ControllerBase
 
             return StatusCode(500, new { message = "An unexpected error occurred" });
         }
+    }
+    [HttpPost("seed-admin")]
+    public async Task<IActionResult> SeedAdmin(
+    [FromServices] UserManager<AppUser> userManager)
+    {
+        var existing = await userManager.FindByEmailAsync("admin@hopperflow.com");
+        if (existing != null)
+            return BadRequest(new { message = "Admin already exists" });
+
+        var admin = new AppUser
+        {
+            UserName = "admin@hopperflow.com",
+            Email = "admin@hopperflow.com",
+            FullName = "HopperFlow Admin",
+            Role = UserRole.Admin,
+            IsActive = true
+        };
+
+        var result = await userManager.CreateAsync(admin, "Admin@123");
+
+        if (result.Succeeded)
+            return Ok(new { message = "Admin created successfully" });
+
+        return BadRequest(result.Errors);
     }
 }

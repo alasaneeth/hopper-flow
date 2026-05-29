@@ -1,6 +1,8 @@
 using HopperFlow.Application.Common.Interfaces;
+using HopperFlow.Application.Common.Interfaces.Repositories;
 using HopperFlow.Domain.Entities;
 using HopperFlow.Infrastructure.Data;
+using HopperFlow.Infrastructure.Repositories;
 using HopperFlow.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -59,6 +61,8 @@ builder.Services.AddAuthentication(options =>
 
 // ===== Services =====
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 // ===== CORS =====
 builder.Services.AddCors(options =>

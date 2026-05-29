@@ -1,4 +1,5 @@
-﻿using HopperFlow.Domain.Enums;
+﻿using HopperFlow.Domain.Common;
+using HopperFlow.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HopperFlow.Domain.Entities
 {
-    public class RiceStock
+    public class RiceStock : BaseEntity
     {
         public ProductType RiceType { get; set; }
         public decimal QuantityKg { get; set; }

@@ -10,6 +10,13 @@ public class RicePurchaseRepository : GenericRepository<RicePurchase>, IRicePurc
 {
     public RicePurchaseRepository(AppDbContext context) : base(context) { }
 
+    public override async Task<IEnumerable<RicePurchase>> GetAllAsync()
+    => await _context.RicePurchases
+        .Include(r => r.Supplier)
+        .Where(r => !r.IsDeleted)
+        .OrderByDescending(r => r.PurchaseDate)
+        .ToListAsync();
+
     public async Task<IEnumerable<RicePurchase>> GetByDateRangeAsync(
         DateTime from, DateTime to)
         => await _context.RicePurchases

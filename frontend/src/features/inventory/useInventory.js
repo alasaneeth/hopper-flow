@@ -53,6 +53,7 @@ const useInventory = () => {
       dispatch(setLoading(true))
       await deleteSupplier(id)
       dispatch(removeSupplier(id))
+      await fetchSuppliers()
     } catch {
       dispatch(setError('Failed to delete supplier'))
     }

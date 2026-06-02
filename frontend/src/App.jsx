@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './features/auth/LoginPage'
 import ProtectedRoute from './routes/ProtectedRoute'
+import Layout from './components/common/Layout'
 import SupplierPage from './features/inventory/SupplierPage'
 
 function App() {
@@ -8,16 +9,20 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/suppliers" element={
-          <ProtectedRoute>
-            <SupplierPage />
-          </ProtectedRoute>
-        } />
         <Route path="/" element={
           <ProtectedRoute>
-            <div className="p-8 text-2xl font-bold text-green-600">
-              🎉 Welcome to HopperFlow!
-            </div>
+            <Layout>
+              <div className="text-white text-2xl font-semibold">
+                🎉 Welcome to HopperFlow!
+              </div>
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/suppliers" element={
+          <ProtectedRoute>
+            <Layout>
+              <SupplierPage />
+            </Layout>
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/login" />} />

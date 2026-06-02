@@ -1,7 +1,8 @@
-import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../features/auth/authSlice'
+import { toggleTheme } from '../../store/themeSlice'
+import { useState } from 'react'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: '▦' },
@@ -15,6 +16,7 @@ const Layout = ({ children }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useSelector(state => state.auth.user)
+  const isDark = useSelector(state => state.theme.isDark)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -22,27 +24,32 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="flex h-screen bg-[#0f0f0f] text-white overflow-hidden">
+    <div className={`flex h-screen overflow-hidden transition-colors duration-300
+      ${isDark ? 'bg-[#0f0f0f] text-white' : 'bg-gray-50 text-gray-900'}`}>
 
       {/* Sidebar */}
-      <aside className={`flex flex-col justify-between
-        bg-[#141414] border-r border-[#232323]
-        transition-all duration-300
+      <aside className={`flex flex-col justify-between transition-all duration-300
+        ${isDark
+          ? 'bg-[#141414] border-r border-[#232323]'
+          : 'bg-white border-r border-gray-200'}
         ${collapsed ? 'w-16' : 'w-56'}`}>
 
         {/* Top */}
         <div>
           {/* Logo */}
-          <div className="flex items-center justify-between px-4 py-5 
-                          border-b border-[#232323]">
+          <div className={`flex items-center justify-between px-4 py-5
+            ${isDark ? 'border-b border-[#232323]' : 'border-b border-gray-100'}`}>
             {!collapsed && (
-              <span className="text-green-400 font-bold text-lg tracking-tight">
+              <span className="text-green-500 font-bold text-lg tracking-tight">
                 HopperFlow
               </span>
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="text-gray-500 hover:text-white transition-colors ml-auto"
+              className={`ml-auto transition-colors
+                ${isDark
+                  ? 'text-gray-600 hover:text-white'
+                  : 'text-gray-400 hover:text-gray-900'}`}
             >
               {collapsed ? '→' : '←'}
             </button>
@@ -59,8 +66,12 @@ const Layout = ({ children }) => {
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg
                    text-sm transition-all duration-150
                    ${isActive
-                    ? 'bg-[#1f1f1f] text-white font-medium'
-                    : 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                    ? isDark
+                      ? 'bg-[#1f1f1f] text-white font-medium'
+                      : 'bg-gray-100 text-gray-900 font-medium'
+                    : isDark
+                      ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                   }`
                 }
               >
@@ -71,46 +82,69 @@ const Layout = ({ children }) => {
           </nav>
         </div>
 
-        {/* Bottom — User + Logout */}
-        <div className="px-2 pb-4 border-t border-[#232323] pt-4">
+        {/* Bottom */}
+        <div className={`px-2 pb-4 pt-4
+          ${isDark ? 'border-t border-[#232323]' : 'border-t border-gray-100'}`}>
+
+          {/* Theme toggle */}
+          <button
+            onClick={() => dispatch(toggleTheme())}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg
+                       text-sm w-full mb-1 transition-all
+                       ${isDark
+                        ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
+          >
+            <span>{isDark ? '☀️' : '🌙'}</span>
+            {!collapsed && (
+              <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+            )}
+          </button>
+
+          {/* User info */}
           {!collapsed && (
-            <div className="px-3 mb-3">
-              <p className="text-xs text-gray-500">Logged in as</p>
-              <p className="text-sm text-white font-medium truncate">
+            <div className={`px-3 mb-2 py-2 rounded-lg
+              ${isDark ? 'bg-[#1a1a1a]' : 'bg-gray-50'}`}>
+              <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                Logged in as
+              </p>
+              <p className={`text-sm font-medium truncate
+                ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {user?.fullName}
               </p>
-              <p className="text-xs text-green-400">{user?.role}</p>
+              <p className="text-xs text-green-500">{user?.role}</p>
             </div>
           )}
+
+          {/* Logout */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg
-                       text-sm text-gray-500 hover:text-red-400 
-                       hover:bg-[#1a1a1a] transition-all w-full"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg
+                       text-sm w-full transition-all
+                       ${isDark
+                        ? 'text-gray-500 hover:text-red-400 hover:bg-[#1a1a1a]'
+                        : 'text-gray-500 hover:text-red-500 hover:bg-red-50'}`}
           >
             <span>⎋</span>
             {!collapsed && <span>Logout</span>}
           </button>
         </div>
-
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[#0f0f0f]">
-
-        {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[#0f0f0f] border-b 
-                        border-[#232323] px-8 py-4">
-          <p className="text-xs text-gray-600">
+      {/* Main */}
+      <main className="flex-1 overflow-y-auto">
+        {/* Topbar */}
+        <div className={`sticky top-0 z-10 px-8 py-4 border-b
+          ${isDark
+            ? 'bg-[#0f0f0f] border-[#232323]'
+            : 'bg-gray-50 border-gray-200'}`}>
+          <p className={`text-xs ${isDark ? 'text-gray-700' : 'text-gray-400'}`}>
             HopperFlow — String Hopper Business Management
           </p>
         </div>
 
-        {/* Page content */}
-        <div className="px-8 py-6">
-          {children}
-        </div>
-
+        {/* Content */}
+        <div className="px-8 py-6">{children}</div>
       </main>
 
     </div>

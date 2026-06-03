@@ -4,6 +4,7 @@ import ProtectedRoute from './routes/ProtectedRoute'
 import Layout from './components/common/Layout'
 import SupplierPage from './features/inventory/SupplierPage'
 import PurchasePage from './features/inventory/PurchasePage'
+import StockPage from './features/inventory/StockPage'
 
 function App() {
   return (
@@ -27,6 +28,11 @@ function App() {
         <Route path="/purchases" element={
           <ProtectedRoute>
             <Layout><PurchasePage /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/stocks" element={
+          <ProtectedRoute>
+            <Layout><StockPage /></Layout>
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/login" />} />

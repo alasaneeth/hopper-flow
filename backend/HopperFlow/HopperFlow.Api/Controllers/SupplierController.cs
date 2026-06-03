@@ -28,16 +28,18 @@ public class SupplierController : ControllerBase
     {
         try
         {
-            var suppliers = await _unitOfWork.Suppliers.GetActiveSupplersAsync();
+            var suppliers = await _unitOfWork.Suppliers.GetAllAsync();
 
-            var result = suppliers.Select(s => new SupplierDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                ContactNumber = s.ContactNumber,
-                Address = s.Address,
-                IsActive = s.IsActive
-            });
+            var result = suppliers
+                .Where(s => !s.IsDeleted)
+                .Select(s => new SupplierDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    ContactNumber = s.ContactNumber,
+                    Address = s.Address,
+                    IsActive = s.IsActive
+                });
 
             return Ok(result);
         }

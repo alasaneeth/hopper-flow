@@ -6,10 +6,10 @@ import { useSelector } from 'react-redux'
 const Modal = ({ show, onClose, children, isDark }) => {
   if (!show) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose} />
-      <div className={`relative z-10 w-full max-w-lg rounded-2xl shadow-2xl
+      <div className={`relative z-10 w-full max-w-lg rounded-2xl shadow-2xl  max-h-[90vh]
         ${isDark
           ? 'bg-[#141414] border border-[#232323]'
           : 'bg-white border border-gray-200'}`}>
@@ -250,7 +250,7 @@ const PurchasePage = () => {
             Record a rice purchase — stock will auto update
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-3">
           {/* Supplier */}
           <div>
             <label className={labelClass}>Supplier *</label>

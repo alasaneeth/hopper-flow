@@ -35,6 +35,8 @@ const SupplierPage = () => {
   const [showModal, setShowModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
+  const [showAll, setShowAll] = useState(false)
+
   const [form, setForm] = useState({
     name: '', contactNumber: '', address: '', isActive: true
   })
@@ -111,26 +113,41 @@ const SupplierPage = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className={`text-2xl font-semibold
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Suppliers
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Manage your rice suppliers
-          </p>
-        </div>
-        <button
-          onClick={() => { setEditMode(false); setShowModal(true) }}
-          className={`text-sm font-medium px-4 py-2 rounded-lg
-            transition-colors
-            ${isDark
-              ? 'bg-white text-black hover:bg-gray-100'
-              : 'bg-gray-900 text-white hover:bg-gray-800'}`}
-        >
-          + Add Supplier
-        </button>
-      </div>
+  <div>
+    <h1 className={`text-2xl font-semibold
+      ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      Suppliers
+    </h1>
+    <p className="text-gray-500 text-sm mt-1">
+      Manage your rice suppliers
+    </p>
+  </div>
+  <div className="flex gap-3">
+    {/* Filter Toggle */}
+    <button
+      onClick={() => setShowAll(!showAll)}
+      className={`text-sm px-4 py-2 rounded-lg border transition-colors
+        ${showAll
+          ? 'border-green-500/50 text-green-400 bg-green-500/10'
+          : isDark
+            ? 'border-[#2a2a2a] text-gray-500 hover:text-white'
+            : 'border-gray-200 text-gray-500 hover:text-gray-900'}`}
+    >
+      {showAll ? '👁 All' : '👁 Active Only'}
+    </button>
+    {/* Add Button */}
+    <button
+      onClick={() => { setEditMode(false); setShowModal(true) }}
+      className={`text-sm font-medium px-4 py-2 rounded-lg
+        transition-colors
+        ${isDark
+          ? 'bg-white text-black hover:bg-gray-100'
+          : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+    >
+      + Add Supplier
+    </button>
+  </div>
+</div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
@@ -188,7 +205,9 @@ const SupplierPage = () => {
                 </td>
               </tr>
             ) : (
-              suppliers.map((s, i) => (
+              suppliers
+              .filter(s => showAll ? true : s.isActive)
+              .map((s, i) => (
                 <tr key={s.id}
                   className={`border-b transition-colors
                     ${isDark

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import useInventory from './useInventory'
 import { useSelector } from 'react-redux'
+import { Pencil, Trash2 } from 'lucide-react'
+
 
 // Modal Component
 const Modal = ({ show, onClose, children, isDark }) => {
@@ -235,24 +237,28 @@ const SupplierPage = () => {
                       {s.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleEdit(s)}
-                        className="text-xs text-gray-500 hover:text-white 
-                                   transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(s.id)}
-                        className="text-xs text-gray-500 hover:text-red-400 
-                                   transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+  <div className="flex gap-2">
+    <button
+      onClick={() => handleEdit(s)}
+      className={`p-1.5 rounded-lg transition-colors
+        ${isDark
+          ? 'text-gray-500 hover:text-white hover:bg-[#2a2a2a]'
+          : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
+    >
+      <Pencil size={14} />
+    </button>
+    <button
+      onClick={() => handleDelete(s.id)}
+      className={`p-1.5 rounded-lg transition-colors
+        ${isDark
+          ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'
+          : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
+    >
+      <Trash2 size={14} />
+    </button>
+  </div>
+</td>
                 </tr>
               ))
             )}

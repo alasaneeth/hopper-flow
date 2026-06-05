@@ -12,12 +12,14 @@ public class UnitOfWork : IUnitOfWork
     public IRicePurchaseRepository RicePurchases { get; }
     public IRiceStockRepository RiceStocks { get; }
 
+    public IProductionBatchRepository ProductionBatches { get; }
     public UnitOfWork(AppDbContext context)
     {
         _context = context;
         Suppliers = new SupplierRepository(context);
         RicePurchases = new RicePurchaseRepository(context);
         RiceStocks = new RiceStockRepository(context);
+        ProductionBatches = new ProductionBatchRepository(context);
     }
 
     public async Task<int> SaveChangesAsync()

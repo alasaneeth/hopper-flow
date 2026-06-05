@@ -11,6 +11,7 @@ namespace HopperFlow.Application.Common.Interfaces.Repositories
         ISupplierRepository Suppliers { get; }
         IRicePurchaseRepository RicePurchases { get; }
         IRiceStockRepository RiceStocks { get; }
+        IProductionBatchRepository ProductionBatches { get; }
         Task<int> SaveChangesAsync();
     }
 }

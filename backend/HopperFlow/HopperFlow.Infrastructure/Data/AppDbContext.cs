@@ -13,6 +13,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<RicePurchase> RicePurchases => Set<RicePurchase>();
     public DbSet<RiceStock> RiceStocks => Set<RiceStock>();
+    public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

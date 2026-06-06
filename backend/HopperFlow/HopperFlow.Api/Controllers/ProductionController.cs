@@ -200,6 +200,16 @@ public class ProductionController : ControllerBase
             if (batch == null || batch.IsDeleted)
                 return NotFound(new { message = "Production batch not found" });
 
+            var stock = await _unitOfWork.RiceStocks
+                         .GetByRiceTypeAsync(batch.ProductType);
+
+            if (stock != null)
+            {
+                stock.QuantityKg += batch.RiceUsedKg;
+                stock.UpdatedAt = DateTime.UtcNow;
+                await _unitOfWork.RiceStocks.UpdateAsync(stock);
+            }
+
             batch.IsDeleted = true;
             batch.UpdatedAt = DateTime.UtcNow;
 

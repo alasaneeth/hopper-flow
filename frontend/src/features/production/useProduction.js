@@ -39,16 +39,18 @@ const useProduction = () => {
     }
   }
 
-  const deleteBatchById = async (id) => {
-    try {
-      dispatch(setLoading(true))
-      await deleteBatch(id)
-      dispatch(removeBatch(id))
-      await fetchBatches()
-    } catch {
-      dispatch(setError('Failed to delete batch'))
-    }
+ const deleteBatchById = async (id) => {
+  try {
+    dispatch(setLoading(true))
+    await deleteBatch(id)
+    await fetchBatches()
+    const stockRes = await getAllStocks()
+    dispatch(setStocks(stockRes.data))
+  } catch {
+    dispatch(setError('Failed to delete batch'))
+    toast.error('Failed to delete batch!')
   }
+}
 
   return {
     batches, loading, error,

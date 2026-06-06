@@ -71,32 +71,34 @@ const ProductionPage = () => {
     }
   }
 
-  const handleDelete = async (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium">Delete this batch?</p>
-        <div className="flex gap-2">
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id)
-              await deleteBatchById(id)
-              toast.success('Batch deleted!')
-            }}
-            className="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg"
-          >
-            Delete
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg"
-          >
-            Cancel
-          </button>
-        </div>
+const handleDelete = async (id) => {
+  toast((t) => (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm font-medium">Delete this batch?</p>
+      <p className="text-xs text-gray-500">
+        ⚠️ Rice stock will be restored automatically
+      </p>
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id)
+            await deleteBatchById(id)
+            toast.success('Batch deleted & stock restored!')
+          }}
+          className="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg"
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => toast.dismiss(t.id)}
+          className="bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg"
+        >
+          Cancel
+        </button>
       </div>
-    ), { duration: 5000 })
-  }
-
+    </div>
+  ), { duration: 5000 })
+}
   const resetForm = () => {
     setForm({
       productType: 1,

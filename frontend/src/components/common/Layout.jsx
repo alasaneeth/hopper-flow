@@ -9,6 +9,8 @@ const navItems = [
   { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
+  { path: '/production', label: 'Production', icon: '⚙️' }, // ← add
+
 ]
 
 const Layout = ({ children }) => {

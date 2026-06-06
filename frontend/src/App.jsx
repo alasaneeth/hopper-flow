@@ -5,6 +5,7 @@ import Layout from './components/common/Layout'
 import SupplierPage from './features/inventory/SupplierPage'
 import PurchasePage from './features/inventory/PurchasePage'
 import StockPage from './features/inventory/StockPage'
+import ProductionPage from './features/production/ProductionPage'
 
 function App() {
   return (
@@ -35,6 +36,11 @@ function App() {
             <Layout><StockPage /></Layout>
           </ProtectedRoute>
         } />
+        <Route path="/production" element={
+          <ProtectedRoute>
+            <Layout><ProductionPage /></Layout>
+          </ProtectedRoute>
+          } />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

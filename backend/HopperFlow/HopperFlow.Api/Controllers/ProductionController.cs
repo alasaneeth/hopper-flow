@@ -38,14 +38,10 @@ public class ProductionController : ControllerBase
                     Id = b.Id,
                     ProductType = b.ProductType,
                     ProductTypeName = b.ProductType.ToString(),
-                    RiceUsedKg = b.RiceUsedKg,
+                    DoughUsedKg = b.DoughUsedKg,
                     HoppersProduced = b.HoppersProduced,
-                    WastageKg = b.WastageKg,
-                    WastagePercentage = b.RiceUsedKg > 0
-                        ? Math.Round((b.WastageKg / b.RiceUsedKg) * 100, 2)
-                        : 0,
-                    ProductionDate = b.ProductionDate,
                     IsSpecialOrder = b.IsSpecialOrder,
+                    ProductionDate = b.ProductionDate,
                     Notes = b.Notes,
                     CreatedAt = b.CreatedAt
                 });
@@ -75,14 +71,10 @@ public class ProductionController : ControllerBase
                 Id = batch.Id,
                 ProductType = batch.ProductType,
                 ProductTypeName = batch.ProductType.ToString(),
-                RiceUsedKg = batch.RiceUsedKg,
+                DoughUsedKg = batch.DoughUsedKg,
                 HoppersProduced = batch.HoppersProduced,
-                WastageKg = batch.WastageKg,
-                WastagePercentage = batch.RiceUsedKg > 0
-                    ? Math.Round((batch.WastageKg / batch.RiceUsedKg) * 100, 2)
-                    : 0,
-                ProductionDate = batch.ProductionDate,
                 IsSpecialOrder = batch.IsSpecialOrder,
+                ProductionDate = batch.ProductionDate,
                 Notes = batch.Notes,
                 CreatedAt = batch.CreatedAt
             };
@@ -103,48 +95,47 @@ public class ProductionController : ControllerBase
     {
         try
         {
-            // 1. Stock check பண்ணு
-            var stock = await _unitOfWork.RiceStocks
-                .GetByRiceTypeAsync(dto.ProductType);
+            // 1. Dough stock check
+            var doughStock = await _unitOfWork.DoughStocks
+                .GetByProductTypeAsync(dto.ProductType);
 
-            if (stock == null || stock.QuantityKg < dto.RiceUsedKg)
+            if (doughStock == null || doughStock.QuantityKg < dto.DoughUsedKg)
                 return BadRequest(new
                 {
-                    message = $"Insufficient stock! Available: {stock?.QuantityKg ?? 0}kg, Required: {dto.RiceUsedKg}kg"
+                    message = $"Insufficient dough stock! Available: {doughStock?.QuantityKg ?? 0}kg, Required: {dto.DoughUsedKg}kg"
                 });
 
             // 2. Production batch create
             var batch = new ProductionBatch
             {
                 ProductType = dto.ProductType,
-                RiceUsedKg = dto.RiceUsedKg,
+                DoughUsedKg = dto.DoughUsedKg,
                 HoppersProduced = dto.HoppersProduced,
-                WastageKg = dto.WastageKg,
-                ProductionDate = dto.ProductionDate,
                 IsSpecialOrder = dto.IsSpecialOrder,
+                ProductionDate = dto.ProductionDate,
                 Notes = dto.Notes
             };
 
             await _unitOfWork.ProductionBatches.AddAsync(batch);
 
-            // 3. Rice stock auto-deduct!
-            stock.QuantityKg -= dto.RiceUsedKg;
-            stock.UpdatedAt = DateTime.UtcNow;
-            await _unitOfWork.RiceStocks.UpdateAsync(stock);
+            // 3. Dough stock auto-deduct!
+            doughStock.QuantityKg -= dto.DoughUsedKg;
+            doughStock.UpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.DoughStocks.UpdateAsync(doughStock);
 
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation(
-                "Production batch created: {ProductType} {Hoppers} hoppers, {Rice}kg rice used",
-                dto.ProductType, dto.HoppersProduced, dto.RiceUsedKg);
+                "Production batch created: {ProductType} {Hoppers} hoppers, {Dough}kg dough used",
+                dto.ProductType, dto.HoppersProduced, dto.DoughUsedKg);
 
             return CreatedAtAction(nameof(GetById),
                 new { id = batch.Id },
                 new
                 {
-                    message = "Production batch recorded and stock updated",
+                    message = "Production batch recorded and dough stock updated",
                     id = batch.Id,
-                    remainingStock = stock.QuantityKg
+                    remainingDoughStock = doughStock.QuantityKg
                 });
         }
         catch (Exception ex)
@@ -167,14 +158,10 @@ public class ProductionController : ControllerBase
                 Id = b.Id,
                 ProductType = b.ProductType,
                 ProductTypeName = b.ProductType.ToString(),
-                RiceUsedKg = b.RiceUsedKg,
+                DoughUsedKg = b.DoughUsedKg,
                 HoppersProduced = b.HoppersProduced,
-                WastageKg = b.WastageKg,
-                WastagePercentage = b.RiceUsedKg > 0
-                    ? Math.Round((b.WastageKg / b.RiceUsedKg) * 100, 2)
-                    : 0,
-                ProductionDate = b.ProductionDate,
                 IsSpecialOrder = b.IsSpecialOrder,
+                ProductionDate = b.ProductionDate,
                 Notes = b.Notes,
                 CreatedAt = b.CreatedAt
             });
@@ -200,25 +187,28 @@ public class ProductionController : ControllerBase
             if (batch == null || batch.IsDeleted)
                 return NotFound(new { message = "Production batch not found" });
 
-            var stock = await _unitOfWork.RiceStocks
-                         .GetByRiceTypeAsync(batch.ProductType);
+            // Dough stock restore!
+            var doughStock = await _unitOfWork.DoughStocks
+                .GetByProductTypeAsync(batch.ProductType);
 
-            if (stock != null)
+            if (doughStock != null)
             {
-                stock.QuantityKg += batch.RiceUsedKg;
-                stock.UpdatedAt = DateTime.UtcNow;
-                await _unitOfWork.RiceStocks.UpdateAsync(stock);
+                doughStock.QuantityKg += batch.DoughUsedKg;
+                doughStock.UpdatedAt = DateTime.UtcNow;
+                await _unitOfWork.DoughStocks.UpdateAsync(doughStock);
             }
 
             batch.IsDeleted = true;
             batch.UpdatedAt = DateTime.UtcNow;
-
             await _unitOfWork.ProductionBatches.UpdateAsync(batch);
+
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Production batch deleted: {Id}", id);
+            _logger.LogInformation(
+                "Production batch deleted: {Id}, Dough restored: {Kg}kg",
+                id, batch.DoughUsedKg);
 
-            return Ok(new { message = "Production batch deleted successfully" });
+            return Ok(new { message = "Batch deleted and dough stock restored" });
         }
         catch (Exception ex)
         {

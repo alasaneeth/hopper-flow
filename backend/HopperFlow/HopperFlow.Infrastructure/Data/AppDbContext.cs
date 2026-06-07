@@ -14,6 +14,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<RicePurchase> RicePurchases => Set<RicePurchase>();
     public DbSet<RiceStock> RiceStocks => Set<RiceStock>();
     public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
+    public DbSet<PreparationBatch> PreparationBatches => Set<PreparationBatch>();
+    public DbSet<DoughStock> DoughStocks => Set<DoughStock>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

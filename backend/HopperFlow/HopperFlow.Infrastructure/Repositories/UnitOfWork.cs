@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IProductionBatchRepository ProductionBatches { get; }
     public IDoughStockRepository DoughStocks { get; }
+    public IPreparationBatchRepository PreparationBatches { get; }
     public UnitOfWork(AppDbContext context)
     {
         _context = context;
@@ -23,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         RiceStocks = new RiceStockRepository(context);
         ProductionBatches = new ProductionBatchRepository(context);
         DoughStocks = new DoughStockRepository(context);
+        PreparationBatches = new PreparationBatchRepository(context);
     }
 
     public async Task<int> SaveChangesAsync()

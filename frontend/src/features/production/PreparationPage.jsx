@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { Trash2 } from 'lucide-react'
 import useProduction from './useProduction'
+import useInventory from '../inventory/useInventory'
 
 const Modal = ({ show, onClose, children, isDark }) => {
   if (!show) return null
@@ -26,30 +27,38 @@ const PRODUCT_TYPES = [
   { value: 2, label: 'Red String Hopper' },
 ]
 
-const ProductionPage = () => {
+const PreparationPage = () => {
   const isDark = useSelector(state => state.theme.isDark)
   const {
-    batches, doughStocks, loading,
-    fetchBatches, fetchDoughStocks,
-    addNewBatch, deleteBatchById,
+    preparations, doughStocks, loading,
+    fetchPreparations, fetchDoughStocks,
+    addNewPreparation, deletePreparationById,
   } = useProduction()
+  const { stocks, fetchStocks } = useInventory()
 
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({
     productType: 1,
-    doughUsedKg: '',
-    hoppersProduced: '',
-    productionDate: new Date().toISOString().split('T')[0],
-    isSpecialOrder: false,
+    riceUsedKg: '',
+    millingDone: false,
+    sievingDone: false,
+    doughProducedKg: '',
+    preparationDate: new Date().toISOString().split('T')[0],
     notes: '',
   })
 
   useEffect(() => {
-    fetchBatches()
+    fetchPreparations()
     fetchDoughStocks()
+    fetchStocks()
   }, [])
 
-  // Available dough stock for selected product type
+  // Available rice stock
+  const availableRiceStock = stocks.find(
+    s => s.riceType === parseInt(form.productType)
+  )
+
+  // Available dough stock
   const availableDoughStock = doughStocks.find(
     s => s.productType === parseInt(form.productType)
   )
@@ -57,34 +66,33 @@ const ProductionPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await addNewBatch({
+      await addNewPreparation({
+        ...form,
         productType: parseInt(form.productType),
-        doughUsedKg: parseFloat(form.doughUsedKg),
-        hoppersProduced: parseInt(form.hoppersProduced),
-        isSpecialOrder: form.isSpecialOrder,
-        productionDate: new Date(form.productionDate).toISOString(),
-        notes: form.notes,
+        riceUsedKg: parseFloat(form.riceUsedKg),
+        doughProducedKg: parseFloat(form.doughProducedKg),
+        preparationDate: new Date(form.preparationDate).toISOString(),
       })
-      toast.success('Production batch recorded & dough stock updated!')
+      toast.success('Preparation recorded & stocks updated!')
       resetForm()
     } catch (err) {
-      toast.error(err.message || 'Failed to record batch!')
+      toast.error(err.message || 'Failed to record preparation!')
     }
   }
 
   const handleDelete = async (id) => {
     toast((t) => (
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium">Delete this batch?</p>
+        <p className="text-sm font-medium">Delete this preparation?</p>
         <p className="text-xs text-gray-500">
-          ⚠️ Dough stock will be restored automatically
+          ⚠️ Rice will be restored, Dough will be deducted
         </p>
         <div className="flex gap-2">
           <button
             onClick={async () => {
               toast.dismiss(t.id)
-              await deleteBatchById(id)
-              toast.success('Batch deleted & dough stock restored!')
+              await deletePreparationById(id)
+              toast.success('Preparation deleted & stocks restored!')
             }}
             className="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg"
           >
@@ -104,10 +112,11 @@ const ProductionPage = () => {
   const resetForm = () => {
     setForm({
       productType: 1,
-      doughUsedKg: '',
-      hoppersProduced: '',
-      productionDate: new Date().toISOString().split('T')[0],
-      isSpecialOrder: false,
+      riceUsedKg: '',
+      millingDone: false,
+      sievingDone: false,
+      doughProducedKg: '',
+      preparationDate: new Date().toISOString().split('T')[0],
       notes: '',
     })
     setShowModal(false)
@@ -122,9 +131,9 @@ const ProductionPage = () => {
   const labelClass = `block text-xs mb-1.5 text-gray-500`
 
   // Stats
-  const totalBatches = batches.length
-  const totalHoppers = batches.reduce((sum, b) => sum + b.hoppersProduced, 0)
-  const specialOrders = batches.filter(b => b.isSpecialOrder).length
+  const totalPreparations = preparations.length
+  const totalRiceUsed = preparations.reduce((sum, p) => sum + p.riceUsedKg, 0)
+  const totalDoughProduced = preparations.reduce((sum, p) => sum + p.doughProducedKg, 0)
 
   return (
     <div>
@@ -133,10 +142,10 @@ const ProductionPage = () => {
         <div>
           <h1 className={`text-2xl font-semibold
             ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            String Hoppers
+            Preparation
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Team 2 — Dough to String Hopper production
+            Team 1 — Rice to Dough preparation
           </p>
         </div>
         <button
@@ -147,16 +156,16 @@ const ProductionPage = () => {
               ? 'bg-white text-black hover:bg-gray-100'
               : 'bg-gray-900 text-white hover:bg-gray-800'}`}
         >
-          + New Batch
+          + New Preparation
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Total Batches', value: totalBatches, color: isDark ? 'text-white' : 'text-gray-900', suffix: '' },
-          { label: 'Hoppers Produced', value: totalHoppers.toLocaleString(), color: 'text-green-500', suffix: '' },
-          { label: 'Special Orders', value: specialOrders, color: 'text-yellow-400', suffix: '' },
+          { label: 'Total Preparations', value: totalPreparations, color: isDark ? 'text-white' : 'text-gray-900', suffix: '' },
+          { label: 'Total Rice Used', value: totalRiceUsed.toFixed(1), color: 'text-red-400', suffix: 'kg' },
+          { label: 'Total Dough Produced', value: totalDoughProduced.toFixed(1), color: 'text-green-500', suffix: 'kg' },
         ].map(stat => (
           <div key={stat.label} className={`rounded-xl p-5 border
             ${isDark
@@ -173,37 +182,51 @@ const ProductionPage = () => {
         ))}
       </div>
 
-      {/* Dough Stock Status */}
-      <div className={`rounded-xl p-5 border mb-6
+      {/* Stock Status */}
+      <div className={`rounded-xl p-5 border mb-6 grid grid-cols-2 gap-6
         ${isDark ? 'bg-[#141414] border-[#232323]' : 'bg-white border-gray-200'}`}>
-        <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">
-          Dough Stock Available
-        </p>
-        {doughStocks.length === 0 ? (
-          <p className="text-sm text-gray-600">
-            No dough available — Preparation (Team 1) needed first!
+
+        {/* Rice Stock */}
+        <div>
+          <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">
+            Rice Stock
           </p>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {doughStocks.map(s => (
-              <div key={s.id} className={`rounded-lg px-4 py-3 border
-                ${s.isLowStock
-                  ? 'bg-red-500/10 border-red-500/20'
-                  : isDark
-                    ? 'bg-[#0f0f0f] border-[#2a2a2a]'
-                    : 'bg-gray-50 border-gray-200'}`}>
-                <p className="text-xs text-gray-500 mb-1">
-                  {s.productTypeName}
-                </p>
-                <p className={`text-xl font-semibold
+          <div className="space-y-2">
+            {stocks.map(s => (
+              <div key={s.id} className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">{s.riceTypeName}</span>
+                <span className={`text-sm font-semibold
                   ${s.isLowStock ? 'text-red-400' : 'text-green-500'}`}>
                   {s.quantityKg} kg
                   {s.isLowStock && ' ⚠️'}
-                </p>
+                </span>
               </div>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Dough Stock */}
+        <div>
+          <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">
+            Dough Stock
+          </p>
+          <div className="space-y-2">
+            {doughStocks.length === 0 ? (
+              <p className="text-sm text-gray-600">No dough stock yet</p>
+            ) : (
+              doughStocks.map(s => (
+                <div key={s.id} className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">{s.productTypeName}</span>
+                  <span className={`text-sm font-semibold
+                    ${s.isLowStock ? 'text-red-400' : 'text-green-500'}`}>
+                    {s.quantityKg} kg
+                    {s.isLowStock && ' ⚠️'}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -213,15 +236,15 @@ const ProductionPage = () => {
           ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
           <p className={`text-sm font-medium
             ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Production History
+            Preparation History
           </p>
         </div>
         <table className="w-full">
           <thead>
             <tr className={`border-b
               ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
-              {['#', 'Date', 'Type', 'Dough Used',
-                'Hoppers', 'Special', 'Notes', ''].map(h => (
+              {['#', 'Date', 'Type', 'Rice Used',
+                'Milling', 'Sieving', 'Dough Produced', 'Notes', ''].map(h => (
                 <th key={h} className="text-left px-6 py-3 text-xs
                                        text-gray-500 font-medium uppercase
                                        tracking-wider">
@@ -233,60 +256,61 @@ const ProductionPage = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="8" className="text-center py-12 text-gray-600">
+                <td colSpan="9" className="text-center py-12 text-gray-600">
                   Loading...
                 </td>
               </tr>
-            ) : batches.length === 0 ? (
+            ) : preparations.length === 0 ? (
               <tr>
-                <td colSpan="8" className="text-center py-12 text-gray-600">
-                  No batches yet — start production!
+                <td colSpan="9" className="text-center py-12 text-gray-600">
+                  No preparations yet — start one!
                 </td>
               </tr>
             ) : (
-              batches.map((b, i) => (
-                <tr key={b.id}
+              preparations.map((p, i) => (
+                <tr key={p.id}
                   className={`border-b transition-colors
                     ${isDark
                       ? 'border-[#1a1a1a] hover:bg-[#171717]'
                       : 'border-gray-50 hover:bg-gray-50'}`}>
                   <td className="px-6 py-4 text-gray-500 text-sm">{i + 1}</td>
                   <td className="px-6 py-4 text-sm text-gray-400">
-                    {new Date(b.productionDate).toLocaleDateString()}
+                    {new Date(p.preparationDate).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5
                       rounded-full text-xs font-medium border
-                      ${b.productType === 1
+                      ${p.productType === 1
                         ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                         : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                      {b.productTypeName}
+                      {p.productTypeName}
                     </span>
                   </td>
                   <td className={`px-6 py-4 text-sm font-medium
                     ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    {b.doughUsedKg} kg
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-green-500">
-                    {b.hoppersProduced.toLocaleString()}
+                    {p.riceUsedKg} kg
                   </td>
                   <td className="px-6 py-4">
-                    {b.isSpecialOrder ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5
-                        rounded-full text-xs font-medium border
-                        bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
-                        ⭐ Special
-                      </span>
-                    ) : (
-                      <span className="text-gray-600 text-xs">Normal</span>
-                    )}
+                    <span className={`text-xs font-medium
+                      ${p.millingDone ? 'text-green-500' : 'text-gray-600'}`}>
+                      {p.millingDone ? '✓ Done' : '✗ No'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`text-xs font-medium
+                      ${p.sievingDone ? 'text-green-500' : 'text-gray-600'}`}>
+                      {p.sievingDone ? '✓ Done' : '✗ No'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-semibold text-green-500">
+                    {p.doughProducedKg} kg
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {b.notes || '—'}
+                    {p.notes || '—'}
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleDelete(b.id)}
+                      onClick={() => handleDelete(p.id)}
                       className={`p-1.5 rounded-lg transition-colors
                         ${isDark
                           ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'
@@ -308,10 +332,10 @@ const ProductionPage = () => {
           ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
           <h2 className={`text-base font-semibold
             ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            New Production Batch
+            New Preparation
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Team 2 — Dough stock will auto deduct on save
+            Team 1 — Rice to Dough
           </p>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-3">
@@ -330,85 +354,86 @@ const ProductionPage = () => {
             </select>
           </div>
 
-          {/* Available Dough Stock */}
-          {availableDoughStock ? (
+          {/* Available Rice Stock */}
+          {availableRiceStock && (
             <div className={`rounded-lg px-4 py-2.5 border
-              ${availableDoughStock.isLowStock
+              ${availableRiceStock.isLowStock
                 ? 'bg-red-500/10 border-red-500/20'
                 : isDark
                   ? 'bg-[#0f0f0f] border-[#2a2a2a]'
                   : 'bg-gray-50 border-gray-200'}`}>
-              <p className="text-xs text-gray-500">Available Dough Stock</p>
+              <p className="text-xs text-gray-500">Available Rice Stock</p>
               <p className={`text-sm font-semibold mt-0.5
-                ${availableDoughStock.isLowStock ? 'text-red-400' : 'text-green-500'}`}>
-                {availableDoughStock.quantityKg} kg
-                {availableDoughStock.isLowStock && ' ⚠️ Low!'}
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-lg px-4 py-2.5 border
-              bg-red-500/10 border-red-500/20">
-              <p className="text-xs text-red-400">
-                ⚠️ No dough stock — Complete Preparation first!
+                ${availableRiceStock.isLowStock ? 'text-red-400' : 'text-green-500'}`}>
+                {availableRiceStock.quantityKg} kg
+                {availableRiceStock.isLowStock && ' ⚠️ Low!'}
               </p>
             </div>
           )}
 
-          {/* Dough Used + Hoppers */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Dough Used (Kg) *</label>
+          {/* Rice Used */}
+          <div>
+            <label className={labelClass}>Rice Used (Kg) *</label>
+            <input
+              type="number" required min="0.1" step="0.1"
+              value={form.riceUsedKg}
+              onChange={e => setForm({ ...form, riceUsedKg: e.target.value })}
+              className={inputClass}
+              placeholder="0.0"
+            />
+          </div>
+
+          {/* Milling + Sieving checkboxes */}
+          <div className={`grid grid-cols-2 gap-3 p-4 rounded-lg border
+            ${isDark ? 'bg-[#0f0f0f] border-[#2a2a2a]' : 'bg-gray-50 border-gray-200'}`}>
+            <div className="flex items-center gap-3">
               <input
-                type="number" required min="0.1" step="0.1"
-                value={form.doughUsedKg}
-                onChange={e => setForm({ ...form, doughUsedKg: e.target.value })}
-                className={inputClass}
-                placeholder="0.0"
+                type="checkbox"
+                id="milling"
+                checked={form.millingDone}
+                onChange={e => setForm({ ...form, millingDone: e.target.checked })}
+                className="w-4 h-4 accent-green-500"
               />
+              <label htmlFor="milling" className={`text-sm
+                ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Milling Done
+              </label>
             </div>
-            <div>
-              <label className={labelClass}>Hoppers Produced *</label>
+            <div className="flex items-center gap-3">
               <input
-                type="number" required min="1"
-                value={form.hoppersProduced}
-                onChange={e => setForm({ ...form, hoppersProduced: e.target.value })}
-                className={inputClass}
-                placeholder="0"
+                type="checkbox"
+                id="sieving"
+                checked={form.sievingDone}
+                onChange={e => setForm({ ...form, sievingDone: e.target.checked })}
+                className="w-4 h-4 accent-green-500"
               />
+              <label htmlFor="sieving" className={`text-sm
+                ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Sieving Done
+              </label>
             </div>
+          </div>
+
+          {/* Dough Produced */}
+          <div>
+            <label className={labelClass}>Dough Produced (Kg) *</label>
+            <input
+              type="number" required min="0.1" step="0.1"
+              value={form.doughProducedKg}
+              onChange={e => setForm({ ...form, doughProducedKg: e.target.value })}
+              className={inputClass}
+              placeholder="0.0"
+            />
           </div>
 
           {/* Date */}
           <div>
-            <label className={labelClass}>Production Date *</label>
+            <label className={labelClass}>Preparation Date *</label>
             <input
               type="date" required
-              value={form.productionDate}
-              onChange={e => setForm({ ...form, productionDate: e.target.value })}
+              value={form.preparationDate}
+              onChange={e => setForm({ ...form, preparationDate: e.target.value })}
               className={inputClass}
-            />
-          </div>
-
-          {/* Special Order */}
-          <div className={`flex items-center justify-between px-4 py-3
-            rounded-lg border
-            ${isDark
-              ? 'bg-[#0f0f0f] border-[#2a2a2a]'
-              : 'bg-gray-50 border-gray-200'}`}>
-            <div>
-              <p className={`text-sm font-medium
-                ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                Special Order
-              </p>
-              <p className="text-xs text-gray-500">
-                Mark as special customer order
-              </p>
-            </div>
-            <input
-              type="checkbox"
-              checked={form.isSpecialOrder}
-              onChange={e => setForm({ ...form, isSpecialOrder: e.target.checked })}
-              className="w-4 h-4 accent-green-500"
             />
           </div>
 
@@ -435,7 +460,7 @@ const ProductionPage = () => {
                   ? 'bg-white text-black hover:bg-gray-100'
                   : 'bg-gray-900 text-white hover:bg-gray-800'}`}
             >
-              {loading ? 'Saving...' : 'Record Batch'}
+              {loading ? 'Saving...' : 'Record Preparation'}
             </button>
             <button
               type="button" onClick={resetForm}
@@ -454,4 +479,4 @@ const ProductionPage = () => {
   )
 }
 
-export default ProductionPage
+export default PreparationPage

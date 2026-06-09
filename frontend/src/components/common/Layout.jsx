@@ -1,20 +1,30 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../features/auth/authSlice'
 import { toggleTheme } from '../../store/themeSlice'
-import { useState } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: '▦' },
   { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
+  {
+    label: 'Production', icon: '⚙️',
+    children: [
+      { path: '/preparation', label: 'Preparation', icon: '🧪' },
+      { path: '/production', label: 'String Hoppers', icon: '🍜' },
+    ]
+  },
 ]
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
+  const [openMenu, setOpenMenu] = useState('Production') // default open
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const user = useSelector(state => state.auth.user)
   const isDark = useSelector(state => state.theme.isDark)
 
@@ -22,6 +32,9 @@ const Layout = ({ children }) => {
     dispatch(logout())
     navigate('/login')
   }
+
+  const isProductionActive = location.pathname === '/preparation' ||
+    location.pathname === '/production'
 
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-300
@@ -57,28 +70,92 @@ const Layout = ({ children }) => {
 
           {/* Nav */}
           <nav className="mt-4 px-2 space-y-1">
-            {navItems.map(item => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg
-                   text-sm transition-all duration-150
-                   ${isActive
-                    ? isDark
-                      ? 'bg-[#1f1f1f] text-white font-medium'
-                      : 'bg-gray-100 text-gray-900 font-medium'
-                    : isDark
-                      ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                  }`
-                }
-              >
-                <span className="text-base">{item.icon}</span>
-                {!collapsed && <span>{item.label}</span>}
-              </NavLink>
-            ))}
+            {navItems.map(item => {
+              // Parent with children
+              if (item.children) {
+                const isOpen = openMenu === item.label
+                return (
+                  <div key={item.label}>
+                    {/* Parent button */}
+                    <button
+                      onClick={() => setOpenMenu(isOpen ? '' : item.label)}
+                      className={`flex items-center justify-between w-full
+                        px-3 py-2.5 rounded-lg text-sm transition-all
+                        ${isProductionActive
+                          ? isDark
+                            ? 'text-white'
+                            : 'text-gray-900'
+                          : isDark
+                            ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-base">{item.icon}</span>
+                        {!collapsed && <span>{item.label}</span>}
+                      </div>
+                      {!collapsed && (
+                        isOpen
+                          ? <ChevronDown size={14} className="text-gray-500" />
+                          : <ChevronRight size={14} className="text-gray-500" />
+                      )}
+                    </button>
+
+                    {/* Children */}
+                    {isOpen && !collapsed && (
+                      <div className="ml-4 mt-1 space-y-1 border-l-2
+                        border-[#232323] pl-2">
+                        {item.children.map(child => (
+                          <NavLink
+                            key={child.path}
+                            to={child.path}
+                            className={({ isActive }) =>
+                              `flex items-center gap-3 px-3 py-2 rounded-lg
+                               text-sm transition-all
+                               ${isActive
+                                ? isDark
+                                  ? 'bg-[#1f1f1f] text-white font-medium'
+                                  : 'bg-gray-100 text-gray-900 font-medium'
+                                : isDark
+                                  ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                              }`
+                            }
+                          >
+                            <span className="text-sm">{child.icon}</span>
+                            <span>{child.label}</span>
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+
+              // Regular nav item
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === '/'}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-lg
+                     text-sm transition-all duration-150
+                     ${isActive
+                      ? isDark
+                        ? 'bg-[#1f1f1f] text-white font-medium'
+                        : 'bg-gray-100 text-gray-900 font-medium'
+                      : isDark
+                        ? 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {!collapsed && <span>{item.label}</span>}
+                </NavLink>
+              )
+            })}
           </nav>
         </div>
 
@@ -133,7 +210,6 @@ const Layout = ({ children }) => {
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto">
-        {/* Topbar */}
         <div className={`sticky top-0 z-10 px-8 py-4 border-b
           ${isDark
             ? 'bg-[#0f0f0f] border-[#232323]'
@@ -142,11 +218,8 @@ const Layout = ({ children }) => {
             HopperFlow — String Hopper Business Management
           </p>
         </div>
-
-        {/* Content */}
         <div className="px-8 py-6">{children}</div>
       </main>
-
     </div>
   )
 }

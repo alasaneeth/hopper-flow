@@ -1,6 +1,5 @@
 ﻿using HopperFlow.Application.Common.Interfaces;
 using HopperFlow.Application.Common.Interfaces.Repositories;
-using HopperFlow.Domain.Entities;
 using HopperFlow.Infrastructure.Data;
 
 namespace HopperFlow.Infrastructure.Repositories;
@@ -12,10 +11,13 @@ public class UnitOfWork : IUnitOfWork
     public ISupplierRepository Suppliers { get; }
     public IRicePurchaseRepository RicePurchases { get; }
     public IRiceStockRepository RiceStocks { get; }
-
     public IProductionBatchRepository ProductionBatches { get; }
     public IDoughStockRepository DoughStocks { get; }
     public IPreparationBatchRepository PreparationBatches { get; }
+    public ICustomerRepository Customers { get; }      // ← add
+    public ISalesOrderRepository SalesOrders { get; }  // ← add
+    public IPaymentRepository Payments { get; }        // ← add
+
     public UnitOfWork(AppDbContext context)
     {
         _context = context;
@@ -25,6 +27,9 @@ public class UnitOfWork : IUnitOfWork
         ProductionBatches = new ProductionBatchRepository(context);
         DoughStocks = new DoughStockRepository(context);
         PreparationBatches = new PreparationBatchRepository(context);
+        Customers = new CustomerRepository(context);      
+        SalesOrders = new SalesOrderRepository(context);   
+        Payments = new PaymentRepository(context);         
     }
 
     public async Task<int> SaveChangesAsync()

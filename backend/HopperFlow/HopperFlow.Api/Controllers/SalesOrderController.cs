@@ -163,20 +163,22 @@ public class SalesOrderController : ControllerBase
 
             await _unitOfWork.SalesOrders.AddAsync(order);
 
-            // 6. Initial payment record (if paid)
+            // 6. முதல்ல Order save பண்ணு — Id generate ஆகும்!
+            await _unitOfWork.SaveChangesAsync();
+
+            // 7. அப்புறம் Payment add பண்ணு
             if (dto.PaidAmount > 0)
             {
                 var payment = new Payment
                 {
-                    SalesOrderId = order.Id,
+                    SalesOrderId = order.Id,  // ← இப்போ Id இருக்கும்!
                     AmountPaid = dto.PaidAmount,
                     PaymentDate = dto.OrderDate,
                     Notes = "Initial payment"
                 };
                 await _unitOfWork.Payments.AddAsync(payment);
+                await _unitOfWork.SaveChangesAsync();
             }
-
-            await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation(
                 "Sales order created: Customer {CustomerId}, Total: {Total}, Outstanding: {Outstanding}",
@@ -195,7 +197,8 @@ public class SalesOrderController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating sales order");
+            _logger.LogError(ex, "Error creating sales order: {Message} | Inner: {Inner}",
+                ex.Message, ex.InnerException?.Message);
             return StatusCode(500, new { message = "An error occurred" });
         }
     }

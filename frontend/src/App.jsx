@@ -8,6 +8,7 @@ import StockPage from "./features/inventory/StockPage";
 import ProductionPage from "./features/production/ProductionPage";
 import PreparationPage from "./features/production/PreparationPage";
 import CustomerPage from "./features/sales/CustomerPage";
+import SalesOrderPage from "./features/sales/SalesOrderPage";
 
 function App() {
   return (
@@ -82,6 +83,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <CustomerPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <SalesOrderPage />
               </Layout>
             </ProtectedRoute>
           }

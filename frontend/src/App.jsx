@@ -6,8 +6,8 @@ import SupplierPage from "./features/inventory/SupplierPage";
 import PurchasePage from "./features/inventory/PurchasePage";
 import StockPage from "./features/inventory/StockPage";
 import ProductionPage from "./features/production/ProductionPage";
-import PreparationPage from './features/production/PreparationPage'
-
+import PreparationPage from "./features/production/PreparationPage";
+import CustomerPage from "./features/sales/CustomerPage";
 
 function App() {
   return (
@@ -72,6 +72,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <ProductionPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CustomerPage />
               </Layout>
             </ProtectedRoute>
           }

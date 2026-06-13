@@ -17,6 +17,8 @@ const navItems = [
       { path: '/production', label: 'String Hoppers', icon: '🍜' },
     ]
   },
+  { path: '/customers', label: 'Customers', icon: '👥' },
+
 ]
 
 const Layout = ({ children }) => {

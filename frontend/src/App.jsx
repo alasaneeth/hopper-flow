@@ -9,6 +9,8 @@ import ProductionPage from "./features/production/ProductionPage";
 import PreparationPage from "./features/production/PreparationPage";
 import CustomerPage from "./features/sales/CustomerPage";
 import SalesOrderPage from "./features/sales/SalesOrderPage";
+import InvoicePage from "./features/sales/InvoicePage";
+import InvoiceListPage from "./features/sales/InvoiceListPage";
 
 function App() {
   return (
@@ -93,6 +95,26 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <SalesOrderPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InvoiceListPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InvoicePage />
               </Layout>
             </ProtectedRoute>
           }

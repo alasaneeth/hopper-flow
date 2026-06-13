@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { Trash2 } from 'lucide-react'
 import useSales from './useSales'
 import NewOrderModal from './NewOrderModal'
 
@@ -11,12 +10,12 @@ const STATUS_STYLES = {
   Pending: 'bg-red-500/10 text-red-400 border-red-500/20',
 }
 
-const SalesOrderPage = () => {
+const InvoiceListPage = () => {
   const isDark = useSelector(state => state.theme.isDark)
+  const navigate = useNavigate()
   const {
     orders, customers, loading,
-    fetchOrders, fetchCustomers,
-    addNewOrder, deleteOrderById,
+    fetchOrders, fetchCustomers, addNewOrder,
   } = useSales()
 
   const [showModal, setShowModal] = useState(false)
@@ -26,34 +25,9 @@ const SalesOrderPage = () => {
     fetchCustomers()
   }, [])
 
-  const handleDelete = async (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium">Delete this order?</p>
-        <div className="flex gap-2">
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id)
-              await deleteOrderById(id)
-              toast.success('Order deleted!')
-            }}
-            className="bg-red-500 text-white text-xs px-3 py-1.5 rounded-lg"
-          >
-            Delete
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="bg-gray-200 text-gray-800 text-xs px-3 py-1.5 rounded-lg"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    ), { duration: 5000 })
-  }
-
   const totalSales = orders.reduce((sum, o) => sum + o.totalAmount, 0)
-  const totalOrders = orders.length
+  const totalCollected = orders.reduce((sum, o) => sum + o.paidAmount, 0)
+  const totalOutstanding = orders.reduce((sum, o) => sum + o.outstandingAmount, 0)
 
   return (
     <div>
@@ -62,10 +36,10 @@ const SalesOrderPage = () => {
         <div>
           <h1 className={`text-2xl font-semibold
             ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Sales Orders
+            Invoices
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Create orders — payments handled in Invoices
+            View invoices and record payments
           </p>
         </div>
         <button
@@ -81,10 +55,11 @@ const SalesOrderPage = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Total Orders', value: totalOrders, color: isDark ? 'text-white' : 'text-gray-900' },
-          { label: 'Total Sales Value', value: `Rs. ${totalSales.toLocaleString()}`, color: 'text-green-500' },
+          { label: 'Total Sales', value: `Rs. ${totalSales.toLocaleString()}`, color: isDark ? 'text-white' : 'text-gray-900' },
+          { label: 'Total Collected', value: `Rs. ${totalCollected.toLocaleString()}`, color: 'text-green-500' },
+          { label: 'Total Outstanding', value: `Rs. ${totalOutstanding.toLocaleString()}`, color: totalOutstanding > 0 ? 'text-red-400' : 'text-green-500' },
         ].map(stat => (
           <div key={stat.label} className={`rounded-xl p-5 border
             ${isDark
@@ -105,14 +80,14 @@ const SalesOrderPage = () => {
           ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
           <p className={`text-sm font-medium
             ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Order History
+            All Invoices
           </p>
         </div>
         <table className="w-full">
           <thead>
             <tr className={`border-b
               ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
-              {['#', 'Date', 'Customer', 'White', 'Red', 'Total', 'Status', ''].map(h => (
+              {['#', 'Invoice', 'Date', 'Customer', 'Total', 'Paid', 'Outstanding', 'Status'].map(h => (
                 <th key={h} className="text-left px-6 py-3 text-xs
                                        text-gray-500 font-medium uppercase
                                        tracking-wider">
@@ -131,17 +106,22 @@ const SalesOrderPage = () => {
             ) : orders.length === 0 ? (
               <tr>
                 <td colSpan="8" className="text-center py-12 text-gray-600">
-                  No orders yet — create one!
+                  No invoices yet — create an order!
                 </td>
               </tr>
             ) : (
               orders.map((o, i) => (
                 <tr key={o.id}
-                  className={`border-b transition-colors
+                  onClick={() => navigate(`/invoices/${o.id}`)}
+                  className={`border-b transition-colors cursor-pointer
                     ${isDark
                       ? 'border-[#1a1a1a] hover:bg-[#171717]'
                       : 'border-gray-50 hover:bg-gray-50'}`}>
                   <td className="px-6 py-4 text-gray-500 text-sm">{i + 1}</td>
+                  <td className={`px-6 py-4 text-sm font-medium
+                    ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    INV-{String(o.id).padStart(4, '0')}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-400">
                     {new Date(o.orderDate).toLocaleDateString()}
                   </td>
@@ -151,15 +131,17 @@ const SalesOrderPage = () => {
                       {o.customerName}
                     </p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-400">
-                    {o.whiteHopperCount}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-400">
-                    {o.redHopperCount}
-                  </td>
                   <td className={`px-6 py-4 text-sm font-medium
                     ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     Rs. {o.totalAmount.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-green-500">
+                    Rs. {o.paidAmount.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={o.outstandingAmount > 0 ? 'text-red-400' : 'text-gray-500'}>
+                      Rs. {o.outstandingAmount.toLocaleString()}
+                    </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5
@@ -167,18 +149,6 @@ const SalesOrderPage = () => {
                       ${STATUS_STYLES[o.paymentStatusName]}`}>
                       {o.paymentStatusName}
                     </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleDelete(o.id)}
-                      className={`p-1.5 rounded-lg transition-colors
-                        ${isDark
-                          ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'
-                          : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
-                      title="Delete"
-                    >
-                      <Trash2 size={14} />
-                    </button>
                   </td>
                 </tr>
               ))
@@ -199,4 +169,4 @@ const SalesOrderPage = () => {
   )
 }
 
-export default SalesOrderPage
+export default InvoiceListPage

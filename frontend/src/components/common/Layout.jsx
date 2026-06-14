@@ -7,6 +7,8 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: '▦' },
+  { path: '/sales', label: 'Sales Orders', icon: '📝' },
+  { path: '/invoices', label: 'Invoices', icon: '🧾' },
   { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
@@ -17,6 +19,8 @@ const navItems = [
       { path: '/production', label: 'String Hoppers', icon: '🍜' },
     ]
   },
+  { path: '/customers', label: 'Customers', icon: '👥' },
+
 ]
 
 const Layout = ({ children }) => {

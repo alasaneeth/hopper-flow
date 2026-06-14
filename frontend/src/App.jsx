@@ -6,8 +6,11 @@ import SupplierPage from "./features/inventory/SupplierPage";
 import PurchasePage from "./features/inventory/PurchasePage";
 import StockPage from "./features/inventory/StockPage";
 import ProductionPage from "./features/production/ProductionPage";
-import PreparationPage from './features/production/PreparationPage'
-
+import PreparationPage from "./features/production/PreparationPage";
+import CustomerPage from "./features/sales/CustomerPage";
+import SalesOrderPage from "./features/sales/SalesOrderPage";
+import InvoicePage from "./features/sales/InvoicePage";
+import InvoiceListPage from "./features/sales/InvoiceListPage";
 
 function App() {
   return (
@@ -72,6 +75,46 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <ProductionPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CustomerPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sales"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <SalesOrderPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InvoiceListPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <InvoicePage />
               </Layout>
             </ProtectedRoute>
           }

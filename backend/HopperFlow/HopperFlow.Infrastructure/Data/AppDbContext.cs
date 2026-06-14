@@ -16,6 +16,9 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
     public DbSet<PreparationBatch> PreparationBatches => Set<PreparationBatch>();
     public DbSet<DoughStock> DoughStocks => Set<DoughStock>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -14,6 +14,10 @@ namespace HopperFlow.Application.Common.Interfaces.Repositories
         IProductionBatchRepository ProductionBatches { get; }
         IDoughStockRepository DoughStocks { get; }
         IPreparationBatchRepository PreparationBatches { get; }
+
+        ICustomerRepository Customers { get; }
+        ISalesOrderRepository SalesOrders { get; }
+        IPaymentRepository Payments { get; }
         Task<int> SaveChangesAsync();
     }
 }

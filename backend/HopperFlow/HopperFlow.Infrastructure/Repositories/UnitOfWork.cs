@@ -14,9 +14,13 @@ public class UnitOfWork : IUnitOfWork
     public IProductionBatchRepository ProductionBatches { get; }
     public IDoughStockRepository DoughStocks { get; }
     public IPreparationBatchRepository PreparationBatches { get; }
-    public ICustomerRepository Customers { get; }      // ← add
-    public ISalesOrderRepository SalesOrders { get; }  // ← add
-    public IPaymentRepository Payments { get; }        // ← add
+    public ICustomerRepository Customers { get; }      
+    public ISalesOrderRepository SalesOrders { get; }  
+    public IPaymentRepository Payments { get; }       
+    public IEmployeeRepository Employees { get; }
+    public IAttendanceRepository Attendances { get; }
+    public IAdvanceRepository Advances { get; }
+    public IPayrollRepository Payrolls { get; }
 
     public UnitOfWork(AppDbContext context)
     {
@@ -29,7 +33,11 @@ public class UnitOfWork : IUnitOfWork
         PreparationBatches = new PreparationBatchRepository(context);
         Customers = new CustomerRepository(context);      
         SalesOrders = new SalesOrderRepository(context);   
-        Payments = new PaymentRepository(context);         
+        Payments = new PaymentRepository(context);
+        Employees = new EmployeeRepository(context);      
+        Attendances = new AttendanceRepository(context);  
+        Advances = new AdvanceRepository(context);        
+        Payrolls = new PayrollRepository(context);
     }
 
     public async Task<int> SaveChangesAsync()

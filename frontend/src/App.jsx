@@ -11,6 +11,7 @@ import CustomerPage from "./features/sales/CustomerPage";
 import SalesOrderPage from "./features/sales/SalesOrderPage";
 import InvoicePage from "./features/sales/InvoicePage";
 import InvoiceListPage from "./features/sales/InvoiceListPage";
+import EmployeePage from "./features/payroll/EmployeePage";
 
 function App() {
   return (
@@ -115,6 +116,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <InvoicePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employees"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EmployeePage />
               </Layout>
             </ProtectedRoute>
           }

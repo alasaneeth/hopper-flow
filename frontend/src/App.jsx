@@ -12,6 +12,7 @@ import SalesOrderPage from "./features/sales/SalesOrderPage";
 import InvoicePage from "./features/sales/InvoicePage";
 import InvoiceListPage from "./features/sales/InvoiceListPage";
 import EmployeePage from "./features/payroll/EmployeePage";
+import AttendancePage from "./features/payroll/AttendancePage";
 
 function App() {
   return (
@@ -130,6 +131,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/attendance" element={
+  <ProtectedRoute>
+    <Layout><AttendancePage /></Layout>
+  </ProtectedRoute>
+} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

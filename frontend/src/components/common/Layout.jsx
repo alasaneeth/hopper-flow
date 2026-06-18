@@ -22,6 +22,7 @@ const navItems = [
   { path: '/customers', label: 'Customers', icon: '👥' },
   { path: '/employees', label: 'Employees', icon: '👨‍🏭' },
   { path: '/attendance', label: 'Attendance', icon: '📅' },
+  { path: '/advances', label: 'Advances', icon: '💵' },
 
 ]
 

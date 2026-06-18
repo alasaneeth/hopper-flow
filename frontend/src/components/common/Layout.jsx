@@ -9,7 +9,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: '▦' },
   { path: '/sales', label: 'Sales Orders', icon: '📝' },
   { path: '/invoices', label: 'Invoices', icon: '🧾' },
-  { path: '/customers', label: 'Customers', icon: '👥' },
+    { path: '/customers', label: 'Customers', icon: '👥' },
   { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
@@ -60,9 +60,9 @@ const isParentActive = (item) =>
         ${collapsed ? 'w-16' : 'w-56'}`}>
 
         {/* Top */}
-        <div>
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Logo */}
-          <div className={`flex items-center justify-between px-4 py-5
+          <div className={`flex items-center justify-between px-4 py-5 flex-shrink-0
             ${isDark ? 'border-b border-[#232323]' : 'border-b border-gray-100'}`}>
             {!collapsed && (
               <span className="text-green-500 font-bold text-lg tracking-tight">
@@ -81,7 +81,8 @@ const isParentActive = (item) =>
           </div>
 
           {/* Nav */}
-          <nav className="mt-4 px-2 space-y-1">
+          <nav className={`mt-4 px-2 space-y-1 overflow-y-auto min-h-0 flex-1
+            ${isDark ? 'sidebar-scroll-dark' : 'sidebar-scroll-light'}`}>
             {navItems.map(item => {
               // Parent with children
               if (item.children) {
@@ -172,7 +173,7 @@ const isParentActive = (item) =>
         </div>
 
         {/* Bottom */}
-        <div className={`px-2 pb-4 pt-4
+        <div className={`px-2 pb-4 pt-4 flex-shrink-0
           ${isDark ? 'border-t border-[#232323]' : 'border-t border-gray-100'}`}>
 
           {/* Theme toggle */}
@@ -232,6 +233,36 @@ const isParentActive = (item) =>
         </div>
         <div className="px-8 py-6">{children}</div>
       </main>
+
+      {/* Scrollbar styling for sidebar nav */}
+      <style>{`
+        .sidebar-scroll-dark::-webkit-scrollbar {
+          width: 6px;
+        }
+        .sidebar-scroll-dark::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-scroll-dark::-webkit-scrollbar-thumb {
+          background-color: #2a2a2a;
+          border-radius: 10px;
+        }
+        .sidebar-scroll-dark::-webkit-scrollbar-thumb:hover {
+          background-color: #3a3a3a;
+        }
+        .sidebar-scroll-light::-webkit-scrollbar {
+          width: 6px;
+        }
+        .sidebar-scroll-light::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-scroll-light::-webkit-scrollbar-thumb {
+          background-color: #e5e7eb;
+          border-radius: 10px;
+        }
+        .sidebar-scroll-light::-webkit-scrollbar-thumb:hover {
+          background-color: #d1d5db;
+        }
+      `}</style>
     </div>
   )
 }

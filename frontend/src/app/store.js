@@ -4,6 +4,7 @@ import inventoryReducer from '../features/inventory/inventorySlice'
 import themeReducer from '../store/themeSlice'
 import productionReducer from '../features/production/productionSlice'
 import salesReducer from '../features/sales/salesSlice'
+import payrollReducer from '../features/payroll/payrollSlice'
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     inventory: inventoryReducer,
     theme: themeReducer,
     production: productionReducer,
-     sales: salesReducer,
+    sales: salesReducer,
+    payroll: payrollReducer,
   },
 })
 

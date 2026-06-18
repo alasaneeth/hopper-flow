@@ -9,9 +9,19 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: '▦' },
   { path: '/sales', label: 'Sales Orders', icon: '📝' },
   { path: '/invoices', label: 'Invoices', icon: '🧾' },
+  { path: '/customers', label: 'Customers', icon: '👥' },
   { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
+  {
+    label: 'Payroll', icon: '💰',
+    children: [
+      { path: '/employees', label: 'Employees', icon: '👨‍🏭' },
+      { path: '/attendance', label: 'Attendance', icon: '📅' },
+      { path: '/advances', label: 'Advances', icon: '💵' },
+      { path: '/payroll', label: 'Salary', icon: '💰' },
+    ]
+  },
   {
     label: 'Production', icon: '⚙️',
     children: [
@@ -19,11 +29,6 @@ const navItems = [
       { path: '/production', label: 'String Hoppers', icon: '🍜' },
     ]
   },
-  { path: '/customers', label: 'Customers', icon: '👥' },
-  { path: '/employees', label: 'Employees', icon: '👨‍🏭' },
-  { path: '/attendance', label: 'Attendance', icon: '📅' },
-  { path: '/advances', label: 'Advances', icon: '💵' },
-
 ]
 
 const Layout = ({ children }) => {
@@ -40,8 +45,8 @@ const Layout = ({ children }) => {
     navigate('/login')
   }
 
-  const isProductionActive = location.pathname === '/preparation' ||
-    location.pathname === '/production'
+const isParentActive = (item) => 
+  item.children?.some(child => location.pathname === child.path)
 
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-300
@@ -88,7 +93,7 @@ const Layout = ({ children }) => {
                       onClick={() => setOpenMenu(isOpen ? '' : item.label)}
                       className={`flex items-center justify-between w-full
                         px-3 py-2.5 rounded-lg text-sm transition-all
-                        ${isProductionActive
+                        ${isParentActive(item)
                           ? isDark
                             ? 'text-white'
                             : 'text-gray-900'

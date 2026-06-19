@@ -19,6 +19,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<Attendance> Attendances => Set<Attendance>();
+    public DbSet<Advance> Advances => Set<Advance>();
+    public DbSet<Payroll> Payrolls => Set<Payroll>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

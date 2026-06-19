@@ -14,6 +14,8 @@ import InvoiceListPage from "./features/sales/InvoiceListPage";
 import EmployeePage from "./features/payroll/EmployeePage";
 import AttendancePage from "./features/payroll/AttendancePage";
 import AdvancePage from "./features/payroll/AdvancePage";
+import PayslipPage from "./features/payroll/PayslipPage";
+import PayrollPage from "./features/payroll/PayrollPage";
 
 function App() {
   return (
@@ -149,6 +151,26 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <AdvancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payroll"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PayrollPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payslip/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PayslipPage />
               </Layout>
             </ProtectedRoute>
           }

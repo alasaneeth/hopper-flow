@@ -18,6 +18,10 @@ namespace HopperFlow.Application.Common.Interfaces.Repositories
         ICustomerRepository Customers { get; }
         ISalesOrderRepository SalesOrders { get; }
         IPaymentRepository Payments { get; }
+        IEmployeeRepository Employees { get; }        
+        IAttendanceRepository Attendances { get; }   
+        IAdvanceRepository Advances { get; }  
+        IPayrollRepository Payrolls { get; }
         Task<int> SaveChangesAsync();
     }
 }

@@ -11,6 +11,11 @@ import CustomerPage from "./features/sales/CustomerPage";
 import SalesOrderPage from "./features/sales/SalesOrderPage";
 import InvoicePage from "./features/sales/InvoicePage";
 import InvoiceListPage from "./features/sales/InvoiceListPage";
+import EmployeePage from "./features/payroll/EmployeePage";
+import AttendancePage from "./features/payroll/AttendancePage";
+import AdvancePage from "./features/payroll/AdvancePage";
+import PayslipPage from "./features/payroll/PayslipPage";
+import PayrollPage from "./features/payroll/PayrollPage";
 
 function App() {
   return (
@@ -115,6 +120,57 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <InvoicePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employees"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EmployeePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/attendance"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AttendancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/advances"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AdvancePage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payroll"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PayrollPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payslip/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PayslipPage />
               </Layout>
             </ProtectedRoute>
           }

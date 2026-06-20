@@ -1,30 +1,12 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import useInventory from './useInventory'
-import { useSelector } from 'react-redux'
 import { Pencil, Trash2 } from 'lucide-react'
-
-
-// Modal Component
-const Modal = ({ show, onClose, children, isDark }) => {
-  if (!show) return null
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      {/* Modal */}
-      <div className={`relative z-10 w-full max-w-lg rounded-2xl shadow-2xl
-        ${isDark
-          ? 'bg-[#141414] border border-[#232323]'
-          : 'bg-white border border-gray-200'}`}>
-        {children}
-      </div>
-    </div>
-  )
-}
+import { useSelector } from 'react-redux'
+import useInventory from './useInventory'
+import Modal from '../../components/common/Modal'
+import StatCard from '../../components/common/StatCard'
+import PageHeader from '../../components/common/PageHeader'
+import InputField from '../../components/common/InputField'
 
 const SupplierPage = () => {
   const isDark = useSelector(state => state.theme.isDark)
@@ -102,72 +84,44 @@ const SupplierPage = () => {
     setSelectedId(null)
   }
 
-  const inputClass = `w-full px-3 py-2.5 rounded-lg text-sm
-    focus:outline-none focus:ring-1 focus:ring-green-500/50
-    ${isDark
-      ? 'bg-[#0f0f0f] border border-[#2a2a2a] text-white placeholder-gray-700'
-      : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400'}`
-
-  const labelClass = `block text-xs mb-1.5
-    ${isDark ? 'text-gray-500' : 'text-gray-500'}`
-
   return (
     <div>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-  <div>
-    <h1 className={`text-2xl font-semibold
-      ${isDark ? 'text-white' : 'text-gray-900'}`}>
-      Suppliers
-    </h1>
-    <p className="text-gray-500 text-sm mt-1">
-      Manage your rice suppliers
-    </p>
-  </div>
-  <div className="flex gap-3">
-    {/* Filter Toggle */}
-    <button
-      onClick={() => setShowAll(!showAll)}
-      className={`text-sm px-4 py-2 rounded-lg border transition-colors
-        ${showAll
-          ? 'border-green-500/50 text-green-400 bg-green-500/10'
-          : isDark
-            ? 'border-[#2a2a2a] text-gray-500 hover:text-white'
-            : 'border-gray-200 text-gray-500 hover:text-gray-900'}`}
-    >
-      {showAll ? '👁 All' : '👁 Active Only'}
-    </button>
-    {/* Add Button */}
-    <button
-      onClick={() => { setEditMode(false); setShowModal(true) }}
-      className={`text-sm font-medium px-4 py-2 rounded-lg
-        transition-colors
-        ${isDark
-          ? 'bg-white text-black hover:bg-gray-100'
-          : 'bg-gray-900 text-white hover:bg-gray-800'}`}
-    >
-      + Add Supplier
-    </button>
-  </div>
-</div>
+      <PageHeader
+        title="Suppliers"
+        subtitle="Manage your rice suppliers"
+        isDark={isDark}
+        action={
+          <>
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className={`text-sm px-4 py-2 rounded-lg border transition-colors
+                ${showAll
+                  ? 'border-green-500/50 text-green-400 bg-green-500/10'
+                  : isDark
+                    ? 'border-[#2a2a2a] text-gray-500 hover:text-white'
+                    : 'border-gray-200 text-gray-500 hover:text-gray-900'}`}
+            >
+              {showAll ? '👁 All' : '👁 Active Only'}
+            </button>
+            <button
+              onClick={() => { setEditMode(false); setShowModal(true) }}
+              className={`text-sm font-medium px-4 py-2 rounded-lg
+                transition-colors
+                ${isDark
+                  ? 'bg-white text-black hover:bg-gray-100'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+            >
+              + Add Supplier
+            </button>
+          </>
+        }
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { label: 'Total', value: suppliers.length, color: isDark ? 'text-white' : 'text-gray-900' },
-          { label: 'Active', value: suppliers.filter(s => s.isActive).length, color: 'text-green-500' },
-          { label: 'Inactive', value: suppliers.filter(s => !s.isActive).length, color: 'text-red-400' },
-        ].map(stat => (
-          <div key={stat.label} className={`rounded-xl p-5 border
-            ${isDark
-              ? 'bg-[#141414] border-[#232323]'
-              : 'bg-white border-gray-200'}`}>
-            <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
-            <p className={`text-2xl font-semibold ${stat.color}`}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
+        <StatCard label="Total" value={suppliers.length} isDark={isDark} />
+        <StatCard label="Active" value={suppliers.filter(s => s.isActive).length} color="text-green-500" isDark={isDark} />
+        <StatCard label="Inactive" value={suppliers.filter(s => !s.isActive).length} color="text-red-400" isDark={isDark} />
       </div>
 
       {/* Table */}
@@ -200,7 +154,7 @@ const SupplierPage = () => {
                   Loading...
                 </td>
               </tr>
-            ) : suppliers.length === 0 ? (
+            ) : suppliers.filter(s => showAll ? true : s.isActive).length === 0 ? (
               <tr>
                 <td colSpan="6" className="text-center py-12 text-gray-600">
                   No suppliers yet — add one!
@@ -208,10 +162,9 @@ const SupplierPage = () => {
               </tr>
             ) : (
               suppliers
-              .filter(s => showAll ? true : s.isActive)
-              .map((s, i) => (
-                <tr key={s.id}
-                  className={`border-b transition-colors
+                .filter(s => showAll ? true : s.isActive)
+                .map((s, i) => (
+                <tr key={s.id} className={`border-b transition-colors
                     ${isDark
                       ? 'border-[#1a1a1a] hover:bg-[#171717]'
                       : 'border-gray-50 hover:bg-gray-50'}`}>
@@ -237,28 +190,28 @@ const SupplierPage = () => {
                       {s.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                <td className="px-6 py-4">
-  <div className="flex gap-2">
-    <button
-      onClick={() => handleEdit(s)}
-      className={`p-1.5 rounded-lg transition-colors
-        ${isDark
-          ? 'text-gray-500 hover:text-white hover:bg-[#2a2a2a]'
-          : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
-    >
-      <Pencil size={14} />
-    </button>
-    <button
-      onClick={() => handleDelete(s.id)}
-      className={`p-1.5 rounded-lg transition-colors
-        ${isDark
-          ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'
-          : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
-    >
-      <Trash2 size={14} />
-    </button>
-  </div>
-</td>
+                  <td className="px-6 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(s)}
+                        className={`p-1.5 rounded-lg transition-colors
+                          ${isDark
+                            ? 'text-gray-500 hover:text-white hover:bg-[#2a2a2a]'
+                            : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(s.id)}
+                        className={`p-1.5 rounded-lg transition-colors
+                          ${isDark
+                            ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'
+                            : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -279,39 +232,33 @@ const SupplierPage = () => {
           </p>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-          <div>
-            <label className={labelClass}>Name *</label>
-            <input
-              type="text" required
-              value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
-              className={inputClass}
-              placeholder="Supplier name"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Contact Number</label>
-            <input
-              type="text"
-              value={form.contactNumber}
-              onChange={e => setForm({ ...form, contactNumber: e.target.value })}
-              className={inputClass}
-              placeholder="077XXXXXXX"
-            />
-          </div>
-          <div>
-            <label className={labelClass}>Address</label>
-            <input
-              type="text"
-              value={form.address}
-              onChange={e => setForm({ ...form, address: e.target.value })}
-              className={inputClass}
-              placeholder="Address"
-            />
-          </div>
+          <InputField
+            label="Name *"
+            type="text" required
+            value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })}
+            placeholder="Supplier name"
+            isDark={isDark}
+          />
+          <InputField
+            label="Contact Number"
+            type="text"
+            value={form.contactNumber}
+            onChange={e => setForm({ ...form, contactNumber: e.target.value })}
+            placeholder="077XXXXXXX"
+            isDark={isDark}
+          />
+          <InputField
+            label="Address"
+            type="text"
+            value={form.address}
+            onChange={e => setForm({ ...form, address: e.target.value })}
+            placeholder="Address"
+            isDark={isDark}
+          />
           {editMode && (
             <div className="flex items-center gap-3">
-              <label className={labelClass}>Active</label>
+              <label className="block text-xs mb-1.5 text-gray-500">Active</label>
               <input
                 type="checkbox"
                 checked={form.isActive}
@@ -345,7 +292,6 @@ const SupplierPage = () => {
           </div>
         </form>
       </Modal>
-
     </div>
   )
 }

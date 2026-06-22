@@ -15,11 +15,18 @@ const navItems = [
      { path: '/customers', label: 'Customers', icon: '👥' },
     ]
   },
-  
- 
-  { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
+
+   {
+    label: 'Inventory', icon: '📦',
+    children: [
+     { path: '/suppliers', label: 'Suppliers', icon: '🏭' },
   { path: '/purchases', label: 'Purchases', icon: '🛒' },
   { path: '/stocks', label: 'Stock', icon: '📦' },
+    ]
+  },
+  
+ 
+
   {
     label: 'Payroll', icon: '💰',
     children: [

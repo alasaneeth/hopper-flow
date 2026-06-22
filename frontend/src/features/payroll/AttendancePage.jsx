@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import usePayroll from './usePayroll'
+import PageHeader from '../../components/common/PageHeader'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -23,19 +24,27 @@ const AttendancePage = () => {
   )
   const [dailyMarks, setDailyMarks] = useState({})
 
-  useEffect(() => {
-    fetchEmployees()
-  }, [])
+  useEffect(() => { fetchEmployees() }, [])
+
+  useEffect(() => { fetchAttendance(month, year) }, [month, year])
+
+  const activeEmployees = employees.filter(e => e.isActive)
 
   useEffect(() => {
-    fetchAttendance(month, year)
-  }, [month, year])
+    const existingMarks = {}
+    activeEmployees.forEach(emp => {
+      const record = attendance.find(a =>
+        a.employeeId === emp.id &&
+        a.date.split('T')[0] === selectedDate
+      )
+      if (record) existingMarks[emp.id] = record.isPresent
+    })
+    setDailyMarks(existingMarks)
+  }, [selectedDate, attendance, employees])
 
-  // Get days in month
   const daysInMonth = new Date(year, month, 0).getDate()
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1)
 
-  // Get attendance for specific employee + day
   const getAttendanceStatus = (employeeId, day) => {
     const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
     const record = attendance.find(a =>
@@ -74,69 +83,46 @@ const AttendancePage = () => {
     }
   }
 
-  const inputClass = `px-3 py-2 rounded-lg text-sm
+  const selectClass = `px-3 py-2 rounded-lg text-sm
     focus:outline-none focus:ring-1 focus:ring-green-500/50
     ${isDark
       ? 'bg-[#0f0f0f] border border-[#2a2a2a] text-white'
       : 'bg-gray-50 border border-gray-200 text-gray-900'}`
 
-  const activeEmployees = employees.filter(e => e.isActive)
-
-  useEffect(() => {
-  const existingMarks = {}
-  activeEmployees.forEach(emp => {
-    const dateStr = selectedDate
-    const record = attendance.find(a =>
-      a.employeeId === emp.id &&
-      a.date.split('T')[0] === dateStr
-    )
-    if (record) {
-      existingMarks[emp.id] = record.isPresent
-    }
-  })
-  setDailyMarks(existingMarks)
-}, [selectedDate, attendance])
-
   return (
     <div>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className={`text-2xl font-semibold
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Attendance
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Mark daily attendance and view monthly records
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className={inputClass}>
-            {MONTHS.map((m, i) => (
-              <option key={i} value={i + 1}>{m}</option>
-            ))}
-          </select>
-          <select value={year} onChange={e => setYear(parseInt(e.target.value))} className={inputClass}>
-            {[2025, 2026, 2027].map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <PageHeader
+        title="Attendance"
+        subtitle="Mark daily attendance and view monthly records"
+        isDark={isDark}
+        action={
+          <>
+            <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className={selectClass}>
+              {MONTHS.map((m, i) => (
+                <option key={i} value={i + 1}>{m}</option>
+              ))}
+            </select>
+            <select value={year} onChange={e => setYear(parseInt(e.target.value))} className={selectClass}>
+              {[2025, 2026, 2027].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </>
+        }
+      />
 
-      {/* Mark Today's Attendance */}
+      {/* Mark Attendance */}
       <div className={`rounded-xl p-6 border mb-6
         ${isDark ? 'bg-[#141414] border-[#232323]' : 'bg-white border-gray-200'}`}>
         <div className="flex justify-between items-center mb-4">
-          <p className={`text-sm font-medium
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Mark Attendance
           </p>
           <input
             type="date"
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
-            className={inputClass}
+            className={selectClass}
           />
         </div>
 
@@ -158,8 +144,7 @@ const AttendancePage = () => {
                         : 'bg-gray-50 border-gray-200'}`}
               >
                 <div>
-                  <p className={`text-sm font-medium
-                    ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {emp.name}
                   </p>
                   <p className="text-xs text-gray-500">{emp.employeeId}</p>
@@ -180,9 +165,7 @@ const AttendancePage = () => {
           disabled={loading}
           className={`text-sm font-medium px-5 py-2 rounded-lg
             transition-colors disabled:opacity-40
-            ${isDark
-              ? 'bg-white text-black hover:bg-gray-100'
-              : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+            ${isDark ? 'bg-white text-black hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
         >
           {loading ? 'Saving...' : 'Save Attendance'}
         </button>
@@ -191,21 +174,18 @@ const AttendancePage = () => {
       {/* Monthly Grid */}
       <div className={`rounded-xl border overflow-hidden
         ${isDark ? 'bg-[#141414] border-[#232323]' : 'bg-white border-gray-200'}`}>
-        <div className={`px-6 py-4 border-b
-          ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
-          <p className={`text-sm font-medium
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <div className={`px-6 py-4 border-b ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
+          <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
             {MONTHS[month - 1]} {year} — Attendance Sheet
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className={`border-b
-                ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
-                <th className="text-left px-4 py-3 text-xs text-gray-500
-                               font-medium uppercase tracking-wider sticky left-0
-                               ${isDark ? 'bg-[#141414]' : 'bg-white'}">
+              <tr className={`border-b ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
+                <th className={`text-left px-4 py-3 text-xs text-gray-500
+                               font-medium sticky left-0
+                               ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
                   Employee
                 </th>
                 {days.map(d => (
@@ -228,8 +208,7 @@ const AttendancePage = () => {
 
                 return (
                   <tr key={emp.id}
-                    className={`border-b
-                      ${isDark ? 'border-[#1a1a1a]' : 'border-gray-50'}`}>
+                    className={`border-b ${isDark ? 'border-[#1a1a1a]' : 'border-gray-50'}`}>
                     <td className={`px-4 py-3 text-sm font-medium sticky left-0
                       ${isDark ? 'text-white bg-[#141414]' : 'text-gray-900 bg-white'}`}>
                       {emp.name}

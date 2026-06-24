@@ -35,7 +35,6 @@ const PayslipPage = () => {
 
   return (
     <div>
-      {/* Top bar */}
       <div className="flex justify-between items-center mb-6 print:hidden">
         <button
           onClick={() => navigate('/payroll')}
@@ -49,70 +48,58 @@ const PayslipPage = () => {
           onClick={() => window.print()}
           className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg
             transition-colors
-            ${isDark
-              ? 'bg-white text-black hover:bg-gray-100'
-              : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+            ${isDark ? 'bg-white text-black hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
         >
           <Printer size={16} />
           Print Payslip
         </button>
       </div>
 
-      {/* Payslip */}
       <div className={`max-w-xl mx-auto rounded-2xl border p-8
         print:border-none print:shadow-none print:rounded-none
         ${isDark ? 'bg-[#141414] border-[#232323]' : 'bg-white border-gray-200'}`}>
 
-        {/* Header */}
-        <div className={`text-center mb-8 pb-6 border-b
-          ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
+        <div className={`text-center mb-8 pb-6 border-b ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
           <h1 className="text-2xl font-bold text-green-500">HopperFlow</h1>
           <p className="text-sm text-gray-500 mt-1">
             Payslip — {MONTHS[payslip.month - 1]} {payslip.year}
           </p>
         </div>
 
-        {/* Employee info */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           <div>
             <p className="text-xs text-gray-500 mb-1">Employee</p>
-            <p className={`text-base font-semibold
-              ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <p className={`text-base font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {payslip.employeeName}
             </p>
             <p className="text-xs text-gray-500 mt-1">{payslip.employeeIdCard}</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-500 mb-1">Role</p>
-            <p className={`text-base font-medium
-              ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <p className={`text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {payslip.roleName}
             </p>
             <p className="text-xs text-gray-500 mt-1">{payslip.salaryTypeName} Salary</p>
           </div>
         </div>
 
-        {/* Breakdown */}
         <table className="w-full text-sm mb-6">
           <tbody>
             <tr className={`border-b ${isDark ? 'border-[#1a1a1a]' : 'border-gray-50'}`}>
               <td className="py-3 text-gray-500">Days Worked</td>
-              <td className={`py-3 text-right font-medium
-                ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <td className={`py-3 text-right font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {payslip.daysWorked}
               </td>
             </tr>
             <tr className={`border-b ${isDark ? 'border-[#1a1a1a]' : 'border-gray-50'}`}>
               <td className="py-3 text-gray-500">Salary Rate</td>
-              <td className={`py-3 text-right font-medium
-                ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <td className={`py-3 text-right font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Rs. {payslip.salaryRate.toLocaleString()}
               </td>
             </tr>
             <tr className={`border-b ${isDark ? 'border-[#1a1a1a]' : 'border-gray-50'}`}>
               <td className="py-3 text-gray-500">Basic Salary</td>
-              <td className={`py-3 text-right font-medium
-                ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <td className={`py-3 text-right font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Rs. {payslip.basicSalary.toLocaleString()}
               </td>
             </tr>
@@ -131,11 +118,8 @@ const PayslipPage = () => {
           </tbody>
         </table>
 
-        {/* Net Salary */}
-        <div className={`flex justify-between items-center pt-4 border-t
-          ${isDark ? 'border-[#232323]' : 'border-gray-200'}`}>
-          <span className={`text-lg font-bold
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <div className={`flex justify-between items-center pt-4 border-t ${isDark ? 'border-[#232323]' : 'border-gray-200'}`}>
+          <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Net Salary
           </span>
           <span className="text-2xl font-bold text-green-500">
@@ -143,7 +127,6 @@ const PayslipPage = () => {
           </span>
         </div>
 
-        {/* Status */}
         <div className="mt-4 flex justify-end">
           <span className={`inline-flex items-center px-3 py-1
             rounded-full text-xs font-medium border
@@ -154,9 +137,7 @@ const PayslipPage = () => {
           </span>
         </div>
 
-        {/* Footer */}
-        <div className={`mt-8 pt-6 border-t text-center
-          ${isDark ? 'border-[#232323]' : 'border-gray-200'}`}>
+        <div className={`mt-8 pt-6 border-t text-center ${isDark ? 'border-[#232323]' : 'border-gray-200'}`}>
           <p className="text-xs text-gray-500">
             This is a computer-generated payslip.
           </p>

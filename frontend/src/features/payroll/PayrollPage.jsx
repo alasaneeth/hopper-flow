@@ -4,22 +4,10 @@ import { useSelector } from 'react-redux'
 import { Receipt } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import usePayroll from './usePayroll'
-
-const Modal = ({ show, onClose, children, isDark }) => {
-  if (!show) return null
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose} />
-      <div className={`relative z-10 w-full max-w-md rounded-2xl shadow-2xl
-        ${isDark
-          ? 'bg-[#141414] border border-[#232323]'
-          : 'bg-white border border-gray-200'}`}>
-        {children}
-      </div>
-    </div>
-  )
-}
+import Modal from '../../components/common/Modal'
+import StatCard from '../../components/common/StatCard'
+import PageHeader from '../../components/common/PageHeader'
+import InputField from '../../components/common/InputField'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -60,91 +48,63 @@ const PayrollPage = () => {
     toast.success('Marked as paid!')
   }
 
-  const inputClass = `px-3 py-2 rounded-lg text-sm
+  const selectClass = `px-3 py-2 rounded-lg text-sm
     focus:outline-none focus:ring-1 focus:ring-green-500/50
     ${isDark
       ? 'bg-[#0f0f0f] border border-[#2a2a2a] text-white'
       : 'bg-gray-50 border border-gray-200 text-gray-900'}`
-
-  const labelClass = `block text-xs mb-1.5 text-gray-500`
 
   const totalNet = payrolls.reduce((sum, p) => sum + p.netSalary, 0)
   const totalPaid = payrolls.filter(p => p.isPaid).length
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className={`text-2xl font-semibold
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            Payroll
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Generate and manage monthly salaries
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className={inputClass}>
-            {MONTHS.map((m, i) => (
-              <option key={i} value={i + 1}>{m}</option>
-            ))}
-          </select>
-          <select value={year} onChange={e => setYear(parseInt(e.target.value))} className={inputClass}>
-            {[2025, 2026, 2027].map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <button
-            onClick={() => setShowGenerateModal(true)}
-            className={`text-sm font-medium px-4 py-2 rounded-lg
-              transition-colors
-              ${isDark
-                ? 'bg-white text-black hover:bg-gray-100'
-                : 'bg-gray-900 text-white hover:bg-gray-800'}`}
-          >
-            Generate Payroll
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Payroll"
+        subtitle="Generate and manage monthly salaries"
+        isDark={isDark}
+        action={
+          <>
+            <select value={month} onChange={e => setMonth(parseInt(e.target.value))} className={selectClass}>
+              {MONTHS.map((m, i) => (
+                <option key={i} value={i + 1}>{m}</option>
+              ))}
+            </select>
+            <select value={year} onChange={e => setYear(parseInt(e.target.value))} className={selectClass}>
+              {[2025, 2026, 2027].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => setShowGenerateModal(true)}
+              className={`text-sm font-medium px-4 py-2 rounded-lg
+                transition-colors
+                ${isDark ? 'bg-white text-black hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+            >
+              Generate Payroll
+            </button>
+          </>
+        }
+      />
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {[
-          { label: 'Employees', value: payrolls.length, color: isDark ? 'text-white' : 'text-gray-900' },
-          { label: 'Total Net Salary', value: `Rs. ${totalNet.toLocaleString()}`, color: 'text-green-500' },
-          { label: 'Paid', value: `${totalPaid} / ${payrolls.length}`, color: isDark ? 'text-white' : 'text-gray-900' },
-        ].map(stat => (
-          <div key={stat.label} className={`rounded-xl p-5 border
-            ${isDark
-              ? 'bg-[#141414] border-[#232323]'
-              : 'bg-white border-gray-200'}`}>
-            <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
-            <p className={`text-2xl font-semibold ${stat.color}`}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
+        <StatCard label="Employees" value={payrolls.length} isDark={isDark} />
+        <StatCard label="Total Net Salary" value={`Rs. ${totalNet.toLocaleString()}`} color="text-green-500" isDark={isDark} />
+        <StatCard label="Paid" value={`${totalPaid} / ${payrolls.length}`} isDark={isDark} />
       </div>
 
-      {/* Table */}
       <div className={`rounded-xl border overflow-hidden
         ${isDark ? 'bg-[#141414] border-[#232323]' : 'bg-white border-gray-200'}`}>
-        <div className={`px-6 py-4 border-b
-          ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
-          <p className={`text-sm font-medium
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        <div className={`px-6 py-4 border-b ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
+          <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
             {MONTHS[month - 1]} {year} — Payroll
           </p>
         </div>
         <table className="w-full">
           <thead>
-            <tr className={`border-b
-              ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
+            <tr className={`border-b ${isDark ? 'border-[#1e1e1e]' : 'border-gray-100'}`}>
               {['Employee', 'Days', 'Basic', 'Bonus', 'Advance', 'Net Salary', 'Status', ''].map(h => (
-                <th key={h} className="text-left px-6 py-3 text-xs
-                                       text-gray-500 font-medium uppercase
-                                       tracking-wider">
+                <th key={h} className="text-left px-6 py-3 text-xs text-gray-500 font-medium uppercase tracking-wider">
                   {h}
                 </th>
               ))}
@@ -152,34 +112,21 @@ const PayrollPage = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="8" className="text-center py-12 text-gray-600">
-                  Loading...
-                </td>
-              </tr>
+              <tr><td colSpan="8" className="text-center py-12 text-gray-600">Loading...</td></tr>
             ) : payrolls.length === 0 ? (
-              <tr>
-                <td colSpan="8" className="text-center py-12 text-gray-600">
-                  No payroll generated for this month yet
-                </td>
-              </tr>
+              <tr><td colSpan="8" className="text-center py-12 text-gray-600">No payroll generated for this month yet</td></tr>
             ) : (
               payrolls.map(p => (
                 <tr key={p.id}
                   className={`border-b transition-colors
-                    ${isDark
-                      ? 'border-[#1a1a1a] hover:bg-[#171717]'
-                      : 'border-gray-50 hover:bg-gray-50'}`}>
+                    ${isDark ? 'border-[#1a1a1a] hover:bg-[#171717]' : 'border-gray-50 hover:bg-gray-50'}`}>
                   <td className="px-6 py-4">
-                    <p className={`text-sm font-medium
-                      ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {p.employeeName}
                     </p>
                     <p className="text-xs text-gray-500">{p.employeeIdCard}</p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-400">
-                    {p.daysWorked}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-400">{p.daysWorked}</td>
                   <td className="px-6 py-4 text-sm text-gray-400">
                     Rs. {p.basicSalary.toLocaleString()}
                   </td>
@@ -189,8 +136,7 @@ const PayrollPage = () => {
                   <td className="px-6 py-4 text-sm text-red-400">
                     Rs. {p.advanceDeduction.toLocaleString()}
                   </td>
-                  <td className={`px-6 py-4 text-sm font-semibold
-                    ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <td className={`px-6 py-4 text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     Rs. {p.netSalary.toLocaleString()}
                   </td>
                   <td className="px-6 py-4">
@@ -231,12 +177,9 @@ const PayrollPage = () => {
         </table>
       </div>
 
-      {/* Generate Modal */}
-      <Modal show={showGenerateModal} onClose={() => setShowGenerateModal(false)} isDark={isDark}>
-        <div className={`px-6 py-5 border-b
-          ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
-          <h2 className={`text-base font-semibold
-            ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      <Modal show={showGenerateModal} onClose={() => setShowGenerateModal(false)} isDark={isDark} maxWidth="max-w-md">
+        <div className={`px-6 py-5 border-b ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
+          <h2 className={`text-base font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Generate Payroll
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -245,33 +188,26 @@ const PayrollPage = () => {
         </div>
         <form onSubmit={handleGenerate} className="px-6 py-5 space-y-3">
           <div className={`rounded-lg px-4 py-3 border
-            ${isDark
-              ? 'bg-[#0f0f0f] border-[#2a2a2a]'
-              : 'bg-gray-50 border-gray-200'}`}>
+            ${isDark ? 'bg-[#0f0f0f] border-[#2a2a2a]' : 'bg-gray-50 border-gray-200'}`}>
             <p className="text-xs text-gray-500">
               Calculates based on attendance, applies bonus and active advance deductions automatically.
               Already generated employees will be skipped.
             </p>
           </div>
-          <div>
-            <label className={labelClass}>Bonus (applies to all employees)</label>
-            <input
-              type="number" min="0" step="0.01"
-              value={bonus}
-              onChange={e => setBonus(e.target.value)}
-              className={inputClass + ' w-full'}
-              placeholder="0.00"
-            />
-          </div>
-          <div className={`flex gap-3 pt-2 border-t
-            ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
+          <InputField
+            label="Bonus (applies to all employees)"
+            type="number" min="0" step="0.01"
+            value={bonus}
+            onChange={e => setBonus(e.target.value)}
+            placeholder="0.00"
+            isDark={isDark}
+          />
+          <div className={`flex gap-3 pt-2 border-t ${isDark ? 'border-[#232323]' : 'border-gray-100'}`}>
             <button
               type="submit" disabled={loading}
               className={`text-sm font-medium px-5 py-2 rounded-lg
                 transition-colors disabled:opacity-40
-                ${isDark
-                  ? 'bg-white text-black hover:bg-gray-100'
-                  : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+                ${isDark ? 'bg-white text-black hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
             >
               {loading ? 'Generating...' : 'Generate'}
             </button>
@@ -279,9 +215,7 @@ const PayrollPage = () => {
               type="button" onClick={() => setShowGenerateModal(false)}
               className={`text-sm px-5 py-2 rounded-lg border
                 transition-colors
-                ${isDark
-                  ? 'text-gray-500 border-[#2a2a2a] hover:text-white'
-                  : 'text-gray-500 border-gray-200 hover:text-gray-900'}`}
+                ${isDark ? 'text-gray-500 border-[#2a2a2a] hover:text-white' : 'text-gray-500 border-gray-200 hover:text-gray-900'}`}
             >
               Cancel
             </button>

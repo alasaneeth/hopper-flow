@@ -16,6 +16,7 @@ import AttendancePage from "./features/payroll/AttendancePage";
 import AdvancePage from "./features/payroll/AdvancePage";
 import PayslipPage from "./features/payroll/PayslipPage";
 import PayrollPage from "./features/payroll/PayrollPage";
+import DashboardPage from "./features/dashboard/DashboardPage";
 
 function App() {
   return (
@@ -27,9 +28,7 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <div className="text-white text-2xl font-semibold">
-                  🎉 Welcome to HopperFlow!
-                </div>
+               <DashboardPage />
               </Layout>
             </ProtectedRoute>
           }

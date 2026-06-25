@@ -24,6 +24,7 @@ public class CustomerController : ControllerBase
 
     // GET: api/Customer
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,Cashier")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -55,6 +56,7 @@ public class CustomerController : ControllerBase
 
     // GET: api/Customer/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Manager,Cashier")]
     public async Task<IActionResult> GetById(int id)
     {
         try

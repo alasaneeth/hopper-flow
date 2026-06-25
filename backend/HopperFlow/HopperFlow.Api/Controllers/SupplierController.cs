@@ -24,6 +24,7 @@ public class SupplierController : ControllerBase
 
     // GET: api/Supplier
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,InventoryManager")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -52,6 +53,7 @@ public class SupplierController : ControllerBase
 
     // GET: api/Supplier/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Manager,InventoryManager")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -81,7 +83,7 @@ public class SupplierController : ControllerBase
 
     // POST: api/Supplier
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateSupplierDto dto)
     {
         try
@@ -112,7 +114,7 @@ public class SupplierController : ControllerBase
 
     // PUT: api/Supplier/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateSupplierDto dto)
     {
         try

@@ -25,7 +25,7 @@ public class PayrollController : ControllerBase
 
     // GET: api/Payroll/month/6/2026
     [HttpGet("month/{month}/{year}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetByMonth(int month, int year)
     {
         try
@@ -45,7 +45,7 @@ public class PayrollController : ControllerBase
 
     // GET: api/Payroll/employee/5
     [HttpGet("employee/{employeeId}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetByEmployee(int employeeId)
     {
         try
@@ -66,7 +66,7 @@ public class PayrollController : ControllerBase
     // POST: api/Payroll/generate
     // Generates payroll for ALL active employees for a given month
     [HttpPost("generate")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GeneratePayroll([FromBody] GeneratePayrollDto dto)
     {
         try

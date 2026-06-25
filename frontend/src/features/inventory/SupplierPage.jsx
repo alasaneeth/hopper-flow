@@ -16,6 +16,7 @@ const SupplierPage = () => {
     editSupplier, deleteSupplierById
   } = useInventory()
 
+
   const [showModal, setShowModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [selectedId, setSelectedId] = useState(null)

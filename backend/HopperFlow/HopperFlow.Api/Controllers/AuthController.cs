@@ -2,6 +2,7 @@
 using HopperFlow.Application.DTOs;
 using HopperFlow.Domain.Entities;
 using HopperFlow.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,14 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
+    private readonly UserManager<AppUser> _userManager;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+
+    public AuthController(IAuthService authService, ILogger<AuthController> logger, UserManager<AppUser> userManager)
     {
         _authService = authService;
         _logger = logger;
+        _userManager = userManager;
     }
 
     [HttpPost("login")]
@@ -71,5 +75,40 @@ public class AuthController : ControllerBase
             return Ok(new { message = "Admin created successfully" });
 
         return BadRequest(result.Errors);
+    }
+
+    // POST: api/Auth/seed-users
+    [HttpPost("seed-users")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SeedUsers()
+    {
+        var users = new[]
+        {
+        new { Email = "manager@hopperflow.com", Password = "Manager@123", FullName = "HopperFlow Manager", Role = "Manager" },
+        new { Email = "cashier@hopperflow.com", Password = "Cashier@123", FullName = "HopperFlow Cashier", Role = "Cashier" },
+        new { Email = "invmanager@hopperflow.com", Password = "InvMgr@123", FullName = "Inventory Manager", Role = "InventoryManager" },
+        new { Email = "prodmanager@hopperflow.com", Password = "ProdMgr@123", FullName = "Production Manager", Role = "ProductionManager" },
+        new { Email = "hr@hopperflow.com", Password = "HR@123456", FullName = "HopperFlow HR", Role = "HR" },
+    };
+
+        foreach (var u in users)
+        {
+            var existing = await _userManager.FindByEmailAsync(u.Email);
+            if (existing != null) continue;
+
+            var user = new AppUser
+            {
+                UserName = u.Email,
+                Email = u.Email,
+                FullName = u.FullName,
+                Role = Enum.Parse<UserRole>(u.Role),
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _userManager.CreateAsync(user, u.Password);
+        }
+
+        return Ok(new { message = "Users seeded successfully" });
     }
 }

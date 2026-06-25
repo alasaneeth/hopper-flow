@@ -24,7 +24,7 @@ public class EmployeeController : ControllerBase
 
     // GET: api/Employee
     [HttpGet]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -60,7 +60,7 @@ public class EmployeeController : ControllerBase
 
     // GET: api/Employee/5
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -96,7 +96,7 @@ public class EmployeeController : ControllerBase
 
     // POST: api/Employee
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> Create([FromBody] CreateEmployeeDto dto)
     {
         try
@@ -135,7 +135,7 @@ public class EmployeeController : ControllerBase
 
     // PUT: api/Employee/5
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateEmployeeDto dto)
     {
         try

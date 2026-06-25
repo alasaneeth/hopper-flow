@@ -23,6 +23,7 @@ public class RiceStockController : ControllerBase
 
     // GET: api/RiceStock
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,InventoryManager")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -81,7 +82,7 @@ public class RiceStockController : ControllerBase
 
     // PUT: api/RiceStock/threshold/1
     [HttpPut("threshold/{id}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateThreshold(int id,
         [FromBody] decimal thresholdKg)
     {

@@ -24,6 +24,7 @@ public class PreparationController : ControllerBase
 
     // GET: api/Preparation
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -58,6 +59,7 @@ public class PreparationController : ControllerBase
 
     // GET: api/Preparation/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -92,7 +94,7 @@ public class PreparationController : ControllerBase
 
     // POST: api/Preparation
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,ProductionManager")]
     public async Task<IActionResult> Create([FromBody] CreatePreparationBatchDto dto)
     {
         try
@@ -174,6 +176,7 @@ public class PreparationController : ControllerBase
 
     // GET: api/Preparation/doughstock
     [HttpGet("doughstock")]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetDoughStock()
     {
         try

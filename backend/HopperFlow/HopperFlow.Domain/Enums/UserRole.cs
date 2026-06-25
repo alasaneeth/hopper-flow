@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace HopperFlow.Domain.Enums;
 
-namespace HopperFlow.Domain.Enums
+public enum UserRole
 {
-    public enum UserRole
-    {
-        Admin = 1,
-        Manager = 2,
-        Cashier = 3
-    }
+    Admin = 1,
+    Manager = 2,
+    Cashier = 3,
+    InventoryManager = 4,
+    ProductionManager = 5,
+    HR = 6
 }

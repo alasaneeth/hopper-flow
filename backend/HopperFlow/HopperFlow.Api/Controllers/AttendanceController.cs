@@ -24,7 +24,7 @@ public class AttendanceController : ControllerBase
 
     // GET: api/Attendance/month/6/2026
     [HttpGet("month/{month}/{year}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetByMonth(int month, int year)
     {
         try
@@ -51,7 +51,7 @@ public class AttendanceController : ControllerBase
 
     // GET: api/Attendance/employee/5/month/6/2026
     [HttpGet("employee/{employeeId}/month/{month}/{year}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> GetByEmployeeAndMonth(int employeeId, int month, int year)
     {
         try
@@ -79,7 +79,7 @@ public class AttendanceController : ControllerBase
 
     // POST: api/Attendance/mark
     [HttpPost("mark")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> MarkAttendance([FromBody] MarkAttendanceDto dto)
     {
         try
@@ -129,7 +129,7 @@ public class AttendanceController : ControllerBase
 
     // POST: api/Attendance/mark-bulk
     [HttpPost("mark-bulk")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,HR")]
     public async Task<IActionResult> MarkBulkAttendance([FromBody] List<MarkAttendanceDto> dtos)
     {
         try

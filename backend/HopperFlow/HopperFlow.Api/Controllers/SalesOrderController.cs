@@ -25,6 +25,7 @@ public class SalesOrderController : ControllerBase
 
     // GET: api/SalesOrder
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,Cashier")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -71,6 +72,7 @@ public class SalesOrderController : ControllerBase
 
     // GET: api/SalesOrder/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Manager,Cashier")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -270,6 +272,7 @@ public class SalesOrderController : ControllerBase
 
     // GET: api/SalesOrder/pending
     [HttpGet("pending")]
+    [Authorize(Roles = "Admin,Manager,Cashier")]
     public async Task<IActionResult> GetPendingOrders()
     {
         try

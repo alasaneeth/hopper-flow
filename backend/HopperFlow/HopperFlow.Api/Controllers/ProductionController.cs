@@ -24,6 +24,7 @@ public class ProductionController : ControllerBase
 
     // GET: api/Production
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -57,6 +58,7 @@ public class ProductionController : ControllerBase
 
     // GET: api/Production/5
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -90,7 +92,7 @@ public class ProductionController : ControllerBase
 
     // POST: api/Production
     [HttpPost]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,ProductionManager")]
     public async Task<IActionResult> Create([FromBody] CreateProductionBatchDto dto)
     {
         try
@@ -147,6 +149,7 @@ public class ProductionController : ControllerBase
 
     // GET: api/Production/special-orders
     [HttpGet("special-orders")]
+    [Authorize(Roles = "Admin,Manager,ProductionManager")]
     public async Task<IActionResult> GetSpecialOrders()
     {
         try

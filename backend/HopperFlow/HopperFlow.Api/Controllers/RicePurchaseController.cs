@@ -23,6 +23,7 @@ namespace HopperFlow.Api.Controllers
 
         // GET: api/RicePurchase
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,InventoryManager")]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -56,6 +57,7 @@ namespace HopperFlow.Api.Controllers
 
         // GET: api/RicePurchase/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,InventoryManager")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -90,7 +92,7 @@ namespace HopperFlow.Api.Controllers
 
         // POST: api/RicePurchase
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateRicePurchaseDto dto)
         {
             try
@@ -186,7 +188,5 @@ namespace HopperFlow.Api.Controllers
                 return StatusCode(500, new { message = "An error occurred" });
             }
         }
-
-
     }
 }
